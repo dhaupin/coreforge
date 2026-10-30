@@ -117,6 +117,10 @@ The shell carried its own cut of the family release tooling, and the copies had 
 - `tests/release-verify.test.cjs` + `tests/check-action-pins.test.cjs` - the canon test legs, run offline on every push.
 - `lib/unwrap-prose.cjs` + the AGENTS.md prose-flow law - the shell adopts the family flowing-prose convention: paragraphs never hard-wrap at commit time, and the tool joins them without touching frontmatter, fences, indented code, tables, headings, thematic breaks, or HTML blocks. Living prose across README/AGENTS/DEPLOY/MANIFEST/packs/labs is flowed.
 
+### The family roster names all five arms (2026-10-29)
+
+`packs/README.md` "Who owns what" named three of the five arms (packstruct, crashtest, poststruct). It now names the full set: eyestruct (the `check`-profile capture lane, conformance-checked through the same pinned SPEC) and govstruct (the govern arm - `registry.v1.json` + `members/<id>.json`, the roster this rig's site half is a member of), plus a line making explicit that coreforge and monoforge are the two forges that compose a member, not arms themselves.
+
 ### Petrol is the shell default; iris retires (2026-10-29)
 
 The shell shipped four paint schemes with iris (a flat indigo) as the default. Iris and petrol are near-identical in practice - both carry an indigo accent and the only real difference is petrol's deep-sea cast - so the default that "reads as a template" was doing no work. The family identity is petrol night / pale sea (#18), so petrol becomes the base and iris is gone: three presets remain (petrol, golden, jade), and a dau that wants the old neutral indigo can still ship it as a free-text scheme with its own block.
