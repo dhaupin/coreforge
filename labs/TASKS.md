@@ -426,3 +426,21 @@ The member formerly called `flowforge` is now **coreforge** (govstruct PRD §16.
 - **Theme/scheme keys are protocol constants, not brand** (`site-theme`, `site-paint-scheme`), so they were left stable across the rebrand - the same rule site.config.js documents.
 - **Verification:** `npm test` 71 pass / 0 fail; `npm run check` green (birth-gate, theme-parity, sync:check, template:check, BRAND-CENSUS PASS - 5 literals confined to site.config.js across 22 surfaces, action-pins PASS 14 refs); `npm run lint:docs` 6/6 PASS.
 - **No version bump** (0.9.0 = 0.9.0); a rename pass, not a released surface.
+
+---
+
+### 2026-11-04 - session: the `create` CLI (Phase 2) + the docs-lane call
+
+The shell's Phase 2 landed: the `coreforge` command exists, and the two tool-coupled CI lanes now have an adopter-safe stamp. Scope this session: the CLI (PRD 6), the template token gaps, the soft action-pin check, and the docs-lane topology call.
+
+- **`bin/coreforge.mjs`** (new) - the five site verbs (`create` / `sync` / `build` / `check` / `doctor`) plus three release verbs (`verify-release` / `release-notes` / `lint-packs`) that forward to the `lib/` scripts the family's `publish.yml` calls. `create` fills every site-template token from a `site.json` (or flags), refuses a surviving `__TOKEN__` by name, and never clobbers. `doctor` is the load-bearing half: config + placeholder residue + derived-freshness + `check`, and generated green is never shipped.
+- **`templates/adopter/`** (new) - the two CI lanes `create` stamps into an adopter (`test.yml`, `publish.yml`), wired to the installed tool. The site template excludes them because they call the `coreforge` package, not the dogfood's `lib/`.
+- **`package.json`** - `bin.coreforge` added; `files` ships `bin/`; `js-yaml` moved devDeps -> deps (the birth-gate and `sync` parse YAML at runtime, so an adopter's install needs it). PRD 7 said "files tightens to bin/, lib/, templates/" - landed.
+- **`lib/release-notes.cjs`** - root now `process.cwd()` (was `__dirname/..`), so an adopter's installed copy reads THEIR changelog. **`lib/verify-release.cjs`** - a `bin` is no longer treated as a loadable root (the new `bin` entry tripped the consumer load probe; a bin is proven by the `bin --version` leg).
+- **`lib/check-action-pins.cjs`** - opt-in `--verify-tags`: resolve each `owner/repo@sha` and refuse a `# vN` comment whose tag does not point at that SHA (the setup-node `# v5`-vs-v7 class). Offline/unauthenticated it SKIPs by name. Live: 13/13 verified.
+- **`docs/cli.md`** (new) + a nav row - the CLI reference. Copied VERBATIM (`lib/template.mjs` `VERBATIM` set): it is prose about the `coreforge` command, whose name is also the dogfood brand, so tokenizing it would rename the command in every stamped site. The brand census does not scan `.md` content, so the doc may name the tool freely.
+- **`site.config.js`** - the comment citing `labs/prd-flowforge.md` (a stale filename an adopter would not have) now states the derivation model inline. This closes the last known template-leak residual.
+- **Docs-lane topology - DECIDED (the user's call): leave it alone.** freestruct is the source of truth for the docs CONTENT; coreforge is the provider of a reusable docs LANE (`docs-build.yml` + `docs-deploy.yml`), consumed cross-repo by crashtest. The family runs two topologies on purpose: freestruct's `docs-lane.yml` (which others call) and coreforge's local reusable that calls itself. coreforge is not a docs-site consumer of freestruct's lane, so the crashtest-dogfood-leg blocker (freestruct's lane runs `crashtest run` unconditionally; coreforge ships no `crashtest.config.js`) never arises. No change; recorded so the next agent does not "fix" it.
+- **Template token gaps - CLOSED.** The wordmark composite `__WORDMARK__` token (from the prior session) plus the `site.config.js` comment fix; `create`'s residue guard and the `VERBATIM` set leave no residual leak. `npm run template` green (52 files).
+- **Receipts:** `npm test` 91 pass / 0 fail (7 CLI + 2 pin cases new); `npm run check` green (birth-gate 5 workflows / 14 pins, brand census, sync:check, template:check, theme parity, language); `npm run lint:docs` 6/6 PASS; a temp-dir `create` -> `sync` -> `doctor` round trip is PASS.
+- **No version bump** (0.9.0 = 0.9.0). v1.0.0 is NOT cut - functional first, per the session constraint.

@@ -72,6 +72,11 @@ test('the template carries no identity literal of the dogfood brand (only tokens
       const p = path.join(dir, e.name)
       if (e.isDirectory()) { walk(p); continue }
       if (/\.(png|jpe?g|ico|woff2?|ttf|otf|gif|webp|avif|pdf)$/i.test(e.name)) continue
+      // docs/cli.md is copied VERBATIM: it is prose about the `coreforge`
+      // tool (the command an adopter runs), whose name is also this repo's
+      // dogfood brand. The command must not be renamed, so this one file
+      // legitimately carries the word.
+      if (path.relative(OUT, p) === path.join('docs', 'cli.md')) continue
       const text = fs.readFileSync(p, 'utf8')
       for (const lit of literals) if (lit && text.includes(lit)) hits.push(`${path.relative(OUT, p)}: "${lit}"`)
     }

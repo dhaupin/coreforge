@@ -6,6 +6,23 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), [SemVer](https
 
 ## [Unreleased] - staging (2026-10-29)
 
+### The `create` CLI and the template's tool-coupling (2026-11-04)
+
+Phase 2 of the shell: the `coreforge` command exists. `bin/coreforge.mjs` ships the five site verbs (PRD §6 - `create` / `sync` / `build` / `check` / `doctor`) plus three release verbs (`verify-release` / `release-notes` / `lint-packs`) that forward to the `lib/` scripts the family's `publish.yml` already calls. The load-bearing law is monoforge's: generated green is never shipped - `doctor` refuses placeholder residue, a stale derived surface, and a failing gate, and an unfilled slot is a failure, not a warning.
+
+- **`bin/coreforge.mjs`** (new) - the CLI. `create` fills every site-template token from a `site.json` answer file (or `--name`/`--url`/`--repo` flags), writes the site half plus the two adopter CI lanes, refuses a surviving `__TOKEN__` by name, and never clobbers an existing file. `sync`/`sync --check` drive `lib/sync.mjs`. `check` runs the gate set over the tree. `doctor` runs config + residue + derived-freshness + `check`. The release verbs are passthroughs to the `lib/` scripts, run from the adopter's root.
+- **`package.json`** - `bin.coreforge` added; `files` now ships `bin/`; `js-yaml` moved from `devDependencies` to `dependencies` (the birth-gate and `sync` parse YAML at runtime, so an adopter's install must carry it); `bin/coreforge.mjs` added to the `check` script.
+- **`templates/adopter/`** (new) - the two tool-coupled CI lanes `create` stamps into an adopter: `test.yml` (the gates over the adopter's tree, via `npx coreforge check` + `sync --check`) and `publish.yml` (the release ladder, via `npx coreforge release-notes` / `verify-release`). The site template excludes these two on purpose (they call the `coreforge` package, not the dogfood's `lib/`).
+- **`lib/release-notes.cjs`** - resolves the repo root from `process.cwd()` (was `__dirname/..`), so an adopter running the installed copy reads THEIR `package.json` + `CHANGELOG.md`. The dogfood is unchanged (its cwd is the repo root).
+- **`lib/verify-release.cjs`** - the consumer load probe no longer treats `bin` as a loadable root (a bin-only CLI has no require-able main); a `bin` is proven by the separate `bin --version` leg. Fixes the pack-ladder regression the new `bin` entry introduced.
+- **`lib/check-action-pins.cjs`** - an opt-in `--verify-tags` leg resolves each pinned `owner/repo@sha` against the GitHub API and refuses a `# vN` comment whose tag does not point at that SHA (the class this repo already paid for: `setup-node` labeled `# v5` while pinned to v7). Offline or unauthenticated it degrades to a named SKIP, so the default gate stays hermetic.
+- **`docs/cli.md`** (new) - the CLI reference (the five site verbs, the create flow, what the tool owns vs what the adopter owns), added to `docs/_data/nav.yml`. Copied VERBATIM into the template: it is prose about the `coreforge` command, whose name is also the dogfood brand, so tokenizing it would rename the command in every stamped site.
+- **`lib/template.mjs`** - a `VERBATIM` set copies a file untokenized; the identity-residue guard and the template test both allow it by name.
+- **`site.config.js`** - the comment that cited `labs/prd-flowforge.md` (a stale filename an adopter would not have) now states the derivation model inline.
+- **`tests/cli.test.cjs`** (new) - 7 cases: the round trip (create -> sync -> doctor PASS), the missing-answer refusal, never-clobber, the stale-surface refusal, the residue refusal, the unknown verb (exit 2), and `--version`. `tests/check-action-pins.test.cjs` +2 (the default run makes no network call; `--verify-tags` skips honestly offline).
+- **Receipts:** `npm test` 91 pass / 0 fail; `npm run check` green; `npm run lint:docs` 6/6 PASS; a real `create` -> `sync` -> `doctor` round trip in a temp dir is PASS.
+- **No version bump** (0.9.0 = 0.9.0); v1.0.0 is held until the CLI is proven in the family, not cut here.
+
 ### Family parity: CI truth, the language gate, and a fuller template (2026-11-04)
 
 The shell's CI and gates were audited against the nine struct-family repos and brought into line: the release ladder, the docs lane, the gate set, and the generated template.

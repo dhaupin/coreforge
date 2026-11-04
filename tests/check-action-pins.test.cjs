@@ -71,3 +71,22 @@ test('the repo itself is fully SHA-pinned', () => {
   assert.equal(res.status, 0, res.stderr);
   assert.match(res.stdout, /all SHA-pinned/);
 });
+
+test('the default run makes no tag-comment network check', () => {
+  const res = runGuard({ 'ci.yml': `jobs:\n  a:\n    steps:\n      - uses: actions/checkout@${SHA} # v4\n` });
+  assert.equal(res.status, 0, res.stderr);
+  assert.doesNotMatch(res.stdout, /tag check/);
+});
+
+test('--verify-tags degrades to an honest SKIP on an unresolvable ref (offline-safe)', () => {
+  // A fake slug cannot resolve, so the leg skips instead of failing - the
+  // default gate stays hermetic whether or not the runner has network.
+  const dir = mkdtempSync(join(tmpdir(), 'coreforge-pins-'));
+  const wf = join(dir, 'workflows');
+  mkdirSync(wf, { recursive: true });
+  writeFileSync(join(wf, 'ci.yml'), `jobs:\n  a:\n    steps:\n      - uses: fake-org/fake-action@${SHA} # v9\n`);
+  const res = spawnSync(process.execPath, [GUARD, wf, '--verify-tags'], { encoding: 'utf8' });
+  rmSync(dir, { recursive: true, force: true });
+  assert.equal(res.status, 0, res.stderr);
+  assert.match(res.stdout, /SKIPPED|verified/);
+});

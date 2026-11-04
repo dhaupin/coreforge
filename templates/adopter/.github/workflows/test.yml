@@ -1,0 +1,60 @@
+name: test
+
+# The stamped site's battery: the gates run against YOUR tree (the same gates
+# coreforge runs on itself), plus the two engine builds. This lane is stamped
+# by `coreforge create` and is yours to edit; the gates it calls live in the
+# installed `coreforge` package, so a gate fix reaches you through
+# `npm update coreforge`, not a re-copy.
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  battery:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: '22'
+
+      - name: Install
+        run: npm install --no-audit --no-fund
+
+      # The gates over YOUR tree: brand census, docs frontmatter/links/style/
+      # fiction/liquid, theme parity, language. `coreforge check` resolves your
+      # site root by walking up to site.config.js.
+      - name: Gates (coreforge check)
+        run: npx --no-install coreforge check
+
+      # The derived surfaces must be current: docs/_config.yml,
+      # docs/freestruct.config.yml, web/ssr.config.js, robots.txt,
+      # site.webmanifest. `--check` refuses drift (run `coreforge sync` locally).
+      - name: Derived surfaces are current (coreforge sync --check)
+        run: npx --no-install coreforge sync --check
+
+      - name: Install web deps
+        run: npm install --prefix web --no-audit --no-fund
+
+      - name: Web build (prestruct prerender + 404 repair)
+        run: npm run build --prefix web
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: './docs'
+
+      - name: Docs build (Jekyll)
+        run: cd docs && bundle exec jekyll build
+        env:
+          JEKYLL_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

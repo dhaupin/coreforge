@@ -6,6 +6,7 @@ coreforge is the **shell** the struct family ships new sites from: the landing +
 
 ```text
 site.config.js          THE site identity - the ONE file a rebrand edits
+bin/coreforge.mjs       the CLI: create / sync / build / check / doctor (+ the release verbs)
 lib/                    the TOOL (versioned once, imported by adopters)
   gates/                the check-*.cjs family (frontmatter/links/style/fiction/liquid/theme/language/birth/census)
   root.cjs / root.mjs   resolve the SITE root (walk up to site.config.js)
@@ -21,6 +22,8 @@ templates/site/         the copy source `coreforge create` stamps (GENERATED - n
                         web/ + docs/ + site.config.js + .gitignore + packs/ + the standalone CI
                         (docs lane, its caller, the staging fast-forward); the tool-coupled
                         publish.yml + test.yml are excluded until `create` stamps an adopter's own
+templates/adopter/      the two CI lanes `create` stamps INTO an adopter (test.yml + publish.yml),
+                        wired to the installed `coreforge` package (not the dogfood's lib/)
 web/                    the prestruct landing shell (React/Vite, prerendered) - the dogfood
   src/styles.css        the ENTIRE design system - semantic tokens only
   src/site.js           the web bundle's accessor for site.config.js
@@ -59,6 +62,7 @@ The tool (`lib/`) and the site (`web/` + `docs/` + `site.config.js`) are separat
 npm ci && npm test                                       # hermetic install + the node:test spine
 npm run check && npm run lint:docs                       # the five gates + the birth-gate lane
 npm run lint:packs                                       # packstruct over packs/ (exit 2 names the fix)
+node bin/coreforge.mjs doctor .                          # the truth battery (config + residue + sync + gates)
 npm install --prefix web && npm run build --prefix web   # "N/N pages rendered" is healthy
 cd docs && bundle exec jekyll build                      # optional locally; CI proves it (see DEPLOY.md #22)
 ```
