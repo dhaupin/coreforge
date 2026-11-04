@@ -40,6 +40,29 @@ test('the template ships the shell (web + docs + the identity file)', () => {
   }
 })
 
+test('the template ships the per-repo CI plumbing (docs lane + caller + staging sync)', () => {
+  for (const rel of ['.github/workflows/docs-build.yml', '.github/workflows/docs-deploy.yml', '.github/workflows/staging-ff-sync.yml']) {
+    assert.ok(fs.existsSync(path.join(OUT, rel)), `templates/site/${rel} must exist`)
+  }
+})
+
+test('the template excludes the tool-coupled workflows (release + the dogfood test battery)', () => {
+  for (const rel of ['.github/workflows/release.yml', '.github/workflows/test.yml']) {
+    assert.ok(!fs.existsSync(path.join(OUT, rel)),
+      `templates/site/${rel} is coupled to the coreforge package/tool path - not a stamped artifact`)
+  }
+})
+
+test('the template ships the packs slot (README + gitignore + public/.gitkeep)', () => {
+  for (const rel of ['packs/README.md', 'packs/.gitignore', 'packs/public/.gitkeep']) {
+    assert.ok(fs.existsSync(path.join(OUT, rel)), `templates/site/${rel} must exist`)
+  }
+})
+
+test('the template ships a .gitignore', () => {
+  assert.ok(fs.existsSync(path.join(OUT, '.gitignore')), 'templates/site/.gitignore must exist')
+})
+
 test('the template carries no identity literal of the dogfood brand (only tokens)', async () => {
   const site = (await import(pathToFileURL(path.join(ROOT, 'site.config.js')).href)).default
   const literals = [site.name, site.author, site.docs.url, site.url]

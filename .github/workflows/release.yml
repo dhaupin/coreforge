@@ -74,10 +74,13 @@ jobs:
       # commit reachable.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with: { fetch-depth: 0 }
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v5
+      # No registry-url here: the family canon omits it for the OIDC lane (a
+      # registry-url makes setup-node write an .npmrc that expects NODE_AUTH_TOKEN,
+      # which the tokenless trusted-publishing flow does not have). Publish uses
+      # the default registry.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: '22'
-          registry-url: 'https://registry.npmjs.org'
 
       - name: npm floor for trusted publishing (11.5.1+)
         run: npm install -g npm@^11
@@ -128,7 +131,7 @@ jobs:
           if [ "$REMOTE" = "$LOCAL" ]; then
             echo "coreforge@$LOCAL already on the registry -- skipping publish"
           else
-            npm publish --provenance --access public
+            npm publish --provenance
           fi
 
   release:
@@ -194,7 +197,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with: { fetch-depth: 0 }
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v5
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with: { node-version: '22' }
       - name: the post-publish trust ladder (npm + GH release)
         env:

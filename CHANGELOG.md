@@ -6,6 +6,19 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), [SemVer](https
 
 ## [Unreleased] - staging (2026-10-29)
 
+### Family parity: CI truth, the language gate, and a fuller template (2026-11-04)
+
+The shell's CI and gates were audited against the nine struct-family repos and brought into line: the release ladder, the docs lane, the gate set, and the generated template.
+
+- **Action-pin comments corrected.** `actions/setup-node@949feb24...` was labeled `# v5` in `release.yml` (twice) and `docs-build.yml` but is v7 (verified against the upstream tag); `test.yml` already said v7. The three comments now read `# v7`, so the human tag matches the SHA everywhere.
+- **Publish step aligned to the family canon.** Dropped `--access public` (`npm publish --provenance` is the family shape; the flag is a no-op for an unscoped name) and dropped the `registry-url` from the publish job's `setup-node` - a registry-url writes an `.npmrc` expecting `NODE_AUTH_TOKEN`, which the tokenless OIDC flow does not have.
+- **`lib/gates/check-language.cjs`** (new) - the family language gate: committed prose (docs/, labs/, `.github/**.md`, the root meta set) is English-only, detected by Unicode script-block longest run. Adapted to the shell's `lib/root.cjs` resolver; wired as `npm run lint:language` and into `npm run check`. Ships with `tests/language-gate.test.cjs` (7 behavior cases: the live tree, English pass, a flagged run, the 2-vs-3 char threshold, fenced + inline-code exemptions, the env escape hatch).
+- **`.github/workflows/staging-ff-sync.yml`** (new) - the family automation that fast-forwards the permanent `staging` branch to `main` after a promotion (a fast-forward-only refspec; a divergence fails loudly). The shell previously left this as a manual step.
+- **`templates/site/`** - the generated copy source now carries the per-repo CI plumbing (the docs lane + its thin caller + the staging fast-forward), the `.gitignore`, and the `packs/` slot, alongside the site half. The two tool-coupled workflows (`release.yml`, which publishes the `coreforge` package and calls the dogfood's `lib/`; and `test.yml`, the shell's own battery) are excluded until the `create` CLI stamps an adopter's own. 43 -> 51 files.
+- **`tests/template.test.cjs`** - new assertions for the CI plumbing, the `packs/` slot, the `.gitignore`, and the two exclusions.
+- **Receipts:** `npm test` 82 pass / 0 fail; `npm run check` green (5 workflows parsed, 14 pins SHA-pinned, brand census, sync, template, theme parity, language gate); `npm run lint:docs` 6/6 PASS.
+- **No version bump** (0.9.0 = 0.9.0); a parity pass, not a released surface.
+
 ### The rename: flowforge -> coreforge (2026-11-03)
 
 The shell is renamed **coreforge** (govstruct PRD §16.5). It is also a collision fix: `flowforge` on npm is owned by an unrelated party, so the package could never publish under that name; `coreforge` is free on npm and GitHub. The repo is `dhaupin/coreforge`, the site `coreforge.creadev.org`, the docs `docs.creadev.org/coreforge`.

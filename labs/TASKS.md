@@ -386,6 +386,21 @@ The promotion merge resurrected a stray `web/public/flowforge-logo.jpg`: main's 
 
 ---
 
+### 2026-11-04 - session: family parity (CI truth, language gate, fuller template)
+
+The shell's CI, gates, and generated template were audited against the nine struct-family repos and brought into line. The rename was already done; this is the "get coreforge up to snuff" pass the owner asked for.
+
+- **Action pins, truth in the comments.** `actions/setup-node@949feb24...` is v7 (resolved against the upstream tag), but `release.yml` (twice) and `docs-build.yml` labeled it `# v5`; `test.yml` already said `# v7`. All three now read `# v7`. The pin gate only checks the SHA, so a lying tag comment was invisible to it - worth a future soft check.
+- **Publish step -> family canon.** Dropped `--access public` (the family shape is `npm publish --provenance`; the flag is a no-op for an unscoped name) and dropped `registry-url` from the publish job's `setup-node` (it writes an `.npmrc` expecting `NODE_AUTH_TOKEN`, which OIDC does not have).
+- **`lib/gates/check-language.cjs` (new).** The family language gate (canon: monoforge/poststruct/prestruct/packstruct/freestruct) - committed prose is English-only, detected by Unicode script-block longest run. Adapted to the shell's `lib/root.cjs`; wired as `lint:language` and into `check`. `tests/language-gate.test.cjs` ships the 7 behavior cases (live tree, English pass, flagged run, 2-vs-3 threshold, fenced + inline-code exemption, env escape hatch) - a new law with a fixture that breaks it.
+- **`.github/workflows/staging-ff-sync.yml` (new).** The family automation that fast-forwards `staging` to `main` after a promotion (fast-forward-only refspec; a divergence fails loudly). The shell previously documented this as a manual step.
+- **`templates/site/` -> 51 files.** The generated copy source now carries the standalone CI (docs lane + thin caller + staging fast-forward), the `.gitignore`, and the `packs/` slot, alongside the site half. `release.yml` and `test.yml` are EXCLUDED: both are coupled to the `coreforge` package (release publishes it; test runs the dogfood battery with its pins + `flowforge#N` citations) and to the dogfood's `lib/` path - they belong to the `create` CLI (Phase 2), which stamps an adopter's own.
+- **Docs:** README box table + AGENTS layout updated for the new template scope and the 5-workflow set.
+- **Receipts:** `npm test` 82 pass / 0 fail; `npm run check` green (birth-gate 5 workflows, theme-parity, sync:check, template:check 51 files, brand census, action pins 14 refs); `npm run lint:docs` 6/6 PASS; `npm run lint:language` PASS (8 prose files).
+- **No version bump** (0.9.0 = 0.9.0); a parity pass, not a released surface.
+
+---
+
 ### 2026-11-04 - session: canon parity (release ladder, phone lane, prose flow)
 
 The shell carried its own cut of the family release tooling and it had drifted from the canon the nine struct-family repos now share. Brought it into line so every suite in the family publishes, releases, ships from the phone, and writes prose the same way.
