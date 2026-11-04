@@ -28,7 +28,7 @@ The build lane is a **reusable workflow** (issue #9): the runbook lives once in 
 
 ## 4. Release (npm + GitHub release)
 
-The Version protocol (also in [AGENTS.md](./AGENTS.md)): bump `package.json` + `web/package.json` in the SAME commit as the [CHANGELOG.md](./CHANGELOG.md) entry -> commit -> tag `vX.Y.Z` -> push the tag. `.github/workflows/release.yml` publishes to npm via Trusted Publishing (OIDC): no `NPM_TOKEN` secret involved, provenance signed.
+The Version protocol (also in [AGENTS.md](./AGENTS.md)): bump `package.json` + `web/package.json` in the SAME commit as the [CHANGELOG.md](./CHANGELOG.md) entry -> commit -> tag `vX.Y.Z` -> push the tag. `.github/workflows/publish.yml` publishes to npm via Trusted Publishing (OIDC): no `NPM_TOKEN` secret involved, provenance signed.
 
 - One-time setup per account: link your npm package to the repo under npmjs.com -> package Settings -> Publishing access (or npm trusted publishing config) - the OIDC flow needs that mapping to mint credentials.
 - If a tag-driven run fails, re-push the tag for the retry: `git push origin :refs/tags/vX.Y.Z && git push origin vX.Y.Z` (the workflow cannot re-run a failed run directly).

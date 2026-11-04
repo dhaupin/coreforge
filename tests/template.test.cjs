@@ -47,7 +47,7 @@ test('the template ships the per-repo CI plumbing (docs lane + caller + staging 
 })
 
 test('the template excludes the tool-coupled workflows (release + the dogfood test battery)', () => {
-  for (const rel of ['.github/workflows/release.yml', '.github/workflows/test.yml']) {
+  for (const rel of ['.github/workflows/publish.yml', '.github/workflows/test.yml']) {
     assert.ok(!fs.existsSync(path.join(OUT, rel)),
       `templates/site/${rel} is coupled to the coreforge package/tool path - not a stamped artifact`)
   }

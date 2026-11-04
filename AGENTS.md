@@ -20,7 +20,7 @@ lib/                    the TOOL (versioned once, imported by adopters)
 templates/site/         the copy source `coreforge create` stamps (GENERATED - npm run template):
                         web/ + docs/ + site.config.js + .gitignore + packs/ + the standalone CI
                         (docs lane, its caller, the staging fast-forward); the tool-coupled
-                        release.yml + test.yml are excluded until `create` stamps an adopter's own
+                        publish.yml + test.yml are excluded until `create` stamps an adopter's own
 web/                    the prestruct landing shell (React/Vite, prerendered) - the dogfood
   src/styles.css        the ENTIRE design system - semantic tokens only
   src/site.js           the web bundle's accessor for site.config.js
@@ -30,7 +30,7 @@ web/                    the prestruct landing shell (React/Vite, prerendered) - 
 docs/                   the Jekyll docs rig - the dogfood
   _layouts/default.html header, sidebar, pagefind search, theme tokens
   _data/nav.yml         (yours to add) - sidebar sections come from here
-.github/workflows/      docs-deploy.yml (Pages, thin caller) + docs-build.yml (reusable lane) + release.yml (npm OIDC) + test.yml (the shell battery) + staging-ff-sync.yml
+.github/workflows/      docs-deploy.yml (Pages, thin caller) + docs-build.yml (reusable lane) + publish.yml (npm OIDC) + test.yml (the shell battery) + staging-ff-sync.yml
 labs/TASKS.md           the rolling work log - append entries as you ship
 MANIFEST.md             every extracted file -> source SHA + engine pins
 packs/README.md         the /packs contract (see below) - packs live in packs/public/<name>/
@@ -63,7 +63,7 @@ npm install --prefix web && npm run build --prefix web   # "N/N pages rendered" 
 cd docs && bundle exec jekyll build                      # optional locally; CI proves it (see DEPLOY.md #22)
 ```
 
-`prepublishOnly` = `npm test && npm run check && npm run lint:docs && npm run lint:pins`, so the publish ladder cannot mint a tarball from a red battery (the gate in `release.yml` additionally refuses 0.x and a tag that disagrees with the packaged version, then attaches the served tarball to the release and runs the post-publish trust ladder in `lib/verify-release.cjs`).
+`prepublishOnly` = `npm test && npm run check && npm run lint:docs && npm run lint:pins`, so the publish ladder cannot mint a tarball from a red battery (the gate in `publish.yml` additionally refuses 0.x and a tag that disagrees with the packaged version, then attaches the served tarball to the release and runs the post-publish trust ladder in `lib/verify-release.cjs`).
 
 ## Version protocol (0.9.0 today)
 

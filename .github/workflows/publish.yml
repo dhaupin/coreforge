@@ -1,4 +1,4 @@
-name: release
+name: publish
 
 # The repo-cut release ladder (eyestruct's proven shape, adopted verbatim:
 # dhaupin/eyestruct@4e2b552 .github/workflows/publish.yml). A tag drives the
