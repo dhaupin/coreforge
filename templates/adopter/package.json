@@ -9,7 +9,9 @@
     "sync": "coreforge sync",
     "sync:check": "coreforge sync --check",
     "build": "npm run build --prefix web",
-    "docs": "cd docs && bundle exec jekyll build"
+    "docs": "cd docs && bundle exec jekyll build",
+    "lint:packs": "coreforge lint-packs",
+    "prepublishOnly": "npm run check && npm run sync:check"
   },
   "devDependencies": {
     "coreforge": "^__COREFORGE_VERSION__"

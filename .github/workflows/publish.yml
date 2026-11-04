@@ -110,11 +110,13 @@ jobs:
 
       - name: Install (hermetic when a lockfile ships)
         # The shell ships a root package-lock.json (one devDep: js-yaml, the
-        # birth-gate parser), so this is a real hermetic `npm ci`. Adopters
-        # with no root deps ship no lockfile and get the no-op branch.
+        # birth-gate parser), so this is a real hermetic `npm ci`. An adopter
+        # that carries root deps (a stamped site declares `coreforge` itself,
+        # which `prepublishOnly` calls) gets the same `npm ci`; only a tree
+        # with genuinely no root deps takes the install branch.
         run: |
           if [ -f package-lock.json ]; then npm ci --no-fund --no-audit
-          else echo "no root package-lock.json - nothing to install at the root"; fi
+          else npm install --no-fund --no-audit; fi
 
       # Idempotent: if the registry already has this exact version -- e.g. the
       # release was re-fired after fixing a later workflow -- skip the publish

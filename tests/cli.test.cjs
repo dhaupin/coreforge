@@ -65,6 +65,14 @@ test('create + sync + doctor is a clean round trip', () => {
     assert.ok(existsSync(join(dir, 'docs', '_config.yml')));
     assert.ok(existsSync(join(dir, 'web', 'ssr.config.js')));
 
+    // The stamped package.json carries the release gate: `prepublishOnly`
+    // (what the stamped publish.yml documents as riding every publish) plus
+    // the packstruct wrapper verb the stamped battery calls.
+    const pkg = JSON.parse(require('node:fs').readFileSync(join(dir, 'package.json'), 'utf8'));
+    assert.match(pkg.scripts.prepublishOnly, /check/, 'the stamped site must gate its publish on the battery');
+    assert.equal(pkg.scripts['lint:packs'], 'coreforge lint-packs');
+    assert.equal(pkg.private, true, 'a stamped site is private until the adopter opts into the registry');
+
     const doc = cli(['doctor', dir]);
     assert.equal(doc.status, 0, doc.stdout + doc.stderr);
     assert.match(doc.stdout, /doctor: 0 fail\(s\) - PASS/);

@@ -6,6 +6,31 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), [SemVer](https
 
 ## [Unreleased] - staging (2026-10-29)
 
+### The adopter template: family tool slots and an honest release gate (2026-11-04)
+
+A parity audit of `templates/` against the nine live family sites. The site half (`templates/site/`) was already a clean tokenized copy; the gaps were in the two tool-coupled adopter files, and in the shell's own receipts.
+
+- **`templates/adopter/.github/workflows/test.yml`** - the stamped battery gains the family tool slots coreforge's own battery already carries: **packstruct** (wired, through the `coreforge lint-packs` wrapper verb, so an empty `packs/` is a clean "0 packs checked" and the first `pack.json` is gated from its first commit) and **crashtest** (arm-gated on `crashtest.config.js` - an unconfigured `crashtest run` is a hard exit 2, never a pass). poststruct/eyestruct/govstruct are named TBA in the header (no meaningful role for a fresh static site yet - wiring them would be theater).
+- **`templates/adopter/package.json`** - gains `prepublishOnly` (`npm run check && npm run sync:check`) and `lint:packs` (`coreforge lint-packs`). The stamped `publish.yml` documents that the battery rides `prepublishOnly`, but the stamped `package.json` shipped no such script - so the release gate it advertised did not exist.
+- **`templates/adopter/.github/workflows/publish.yml`** - two real release-path bugs fixed: the publish job's install block was a NO-OP for a lockless adopter (`create` stamps no root lockfile), so the `coreforge` CLI that `prepublishOnly` calls would be missing; and the `release` job called `npx --no-install coreforge release-notes` with NO install step at all. Both jobs now install the tool (`npm ci` when a lockfile ships, else `npm install`). The header also states the activation contract plainly: a stamped site is `"private": true`, so the registry cut is off until the adopter removes it.
+- **`tests/cli.test.cjs` + `tests/template.test.cjs`** - fixtures for the new laws: the stamped `package.json` must carry the `prepublishOnly` gate and the `lint:packs` verb, and the adopter lanes must carry the packstruct slot, the arm-gated crashtest, and an install step in every publish job that calls `coreforge`.
+- **Stale receipts cleaned** (the prestruct 1.2.0 bump retired `repair-404.cjs`, but three receipts still described it as present): `.github/workflows/test.yml`'s build comment, the `MANIFEST.md` row (now `DELETED`, mirroring the `docs-build.yml` precedent), and the `CHANGELOG.md` "Blocked" bullet (now `Resolved`). The prestruct floor/guard/engine-refresh work also gets its own changelog section (it was committed without one).
+- **Receipts:** `npm test` 103 pass / 0 fail; `npm run check` green; `create` -> `sync` -> `doctor` round trip PASS (53 files, stamped `prepublishOnly` present); both adopter workflows YAML-parse.
+- **No version bump** (0.9.0 = 0.9.0); v1.0.0 is still held.
+
+### The prestruct floor, the pin guard, and the engine refresh (2026-11-04)
+
+The family's second drift class, closed: the **prestruct version floor** and the **vendored engine copies** that rode it. The shell had declared `prestruct: ^1.0.0` (lockfile frozen at 1.1.0, missing the 404-head fix), while the rest of the fleet had forked across `^1.0.0`, a bare github commit, and `^1.2.0`. Nothing held the line.
+
+- **`web/package.json` + `templates/site/web/package.json`** - `prestruct` moved `^1.0.0` -> `^1.2.0`; the lockfile resolves 1.2.0. This is the pin bump the `repair-404` retirement was pinned to (see "Blocked", resolved).
+- **`web/scripts/repair-404.cjs`** - deleted (with its template copy). The 1.2.0 engine emits the 404 head correctly, so the workaround is dead weight; `web/package.json`'s `build` is now plain `prestruct build`.
+- **`lib/check-prestruct-pins.cjs`** (new) + `tests/check-prestruct-pins.test.cjs` - the family floor guard, zero-dependency: every `prestruct` declaration must be a semver spec at or above `^1.2.0` (never a bare `github:`/`file:` float), and a committed lockfile must resolve at or above it too. Wired as `npm run lint:prestruct-pins`, into `npm run check`, and it rides the release gate. The 10-case battery proves it bites both ways.
+- **Vendored engine files refreshed** to the prestruct 1.2.0 engine, byte-identical: `web/src/islands.js` (the island observer-lifecycle dedup) and `web/src/hooks/usePageMeta.js` (the react-router 6/7 interop and the trailing-slash canonical fix), in both `web/` and `templates/site/web/`.
+- **`web/index.html`** - the favicon/identity comment no longer writes the literal `<title>` markup: prestruct's duplicate-title audit is comment-blind (a raw tag-name count), so the prose read as a second title element and failed the build. Reworded to "the title tag".
+- **`templates/site/`** - regenerated (50 files, `template:check` PASS).
+- **Receipts:** `npm test` 102 pass / 0 fail; `npm run check` green (template:check, brand census, birth-gate, both pin guards); `npm run lint:docs` PASS; `npm run build --prefix web` ends `audit: 0 failures`, 404 head clean (no `$1`/`$2`).
+- **No version bump** (0.9.0 = 0.9.0); v1.0.0 is still held.
+
 ### The docs-lane consolidation: one lane, no fork (2026-11-04)
 
 The shell shipped its own reusable docs lane (`docs-build.yml`). That fork was the same runbook as `dhaupin/freestruct`'s `docs-lane.yml`, and the two had already drifted - ruby 3.2 vs 3.4, a pagefind `latest` scrape vs an npm pin, no `strict`, no crashtest gate. The exact disease the lanes were built to cure, recreated one level up. The fork is gone: the family builds docs from ONE lane, and the shell is a caller like every sibling.
@@ -185,7 +210,7 @@ A two-bucket round: adopt the fixes the family's newest repos already paid for (
 
 ### Blocked
 
-- Retiring `web/scripts/repair-404.cjs` (issue #42 / #33, the prestruct literal-`$1`/`$2` 404 leak): the root fix - generate the 404 through the injection pipeline, function replacers expanded - is on prestruct `main` as 1.2.0 but is NOT on npm (latest still 1.1.0, which ships the leak; verified: the raw 1.1.0 `404.html` carries four literal `$1`/`$2` bytes, `repair-404` cleans them to zero). The script stays until the pin bump that carries the fix; `web/package.json` still pins `prestruct: ^1.0.0`.
+- **Resolved 2026-11-04.** Retiring `web/scripts/repair-404.cjs` (issue #42 / #33, the prestruct literal-`$1`/`$2` 404 leak): the root fix - generate the 404 through the injection pipeline, function replacers expanded - shipped on npm as prestruct 1.2.0. The pin bump that carried it is the session below; the script is deleted, and `web/package.json` now pins `prestruct: ^1.2.0`. (Original receipt: the fix was on prestruct `main` as 1.2.0 but NOT yet on npm - latest was 1.1.0, which ships the leak; verified: the raw 1.1.0 `404.html` carried four literal `$1`/`$2` bytes, `repair-404` cleaned them to zero.)
 
 ## [0.9.0] - 2026-10-24
 

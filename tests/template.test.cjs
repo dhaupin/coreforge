@@ -58,6 +58,24 @@ test('the template excludes the tool-coupled workflows (release + the dogfood te
   }
 })
 
+test('the adopter lanes carry the family tool slots (packstruct + the arm-gated crashtest)', () => {
+  const ADOPTER = path.join(ROOT, 'templates', 'adopter')
+  const test = fs.readFileSync(path.join(ADOPTER, '.github', 'workflows', 'test.yml'), 'utf8')
+  // packstruct is wired through coreforge's own wrapper verb; crashtest is
+  // arm-gated on the config (an unconfigured `crashtest run` is a hard exit 2,
+  // never a pass - the family forbids theater).
+  assert.match(test, /npm run lint:packs/, 'the adopter battery must run the packstruct lane')
+  assert.match(test, /hashFiles\('crashtest\.config\.js'\)/, 'the crashtest lane must arm-gate on the config')
+  // The release ladder installs the tool in EVERY job that calls it (the
+  // release job calls `coreforge release-notes`), so a lockless adopter is not
+  // left with a missing CLI.
+  const pub = fs.readFileSync(path.join(ADOPTER, '.github', 'workflows', 'publish.yml'), 'utf8')
+  const installs = (pub.match(/npm (?:ci|install)[^\n]*--no-(?:fund|audit)/g) || []).length
+  assert.ok(installs >= 3, `every publish job that calls coreforge must install it (found ${installs} install steps)`)
+  assert.doesNotMatch(pub, /nothing to install at the root/,
+    'a lockless adopter still needs the coreforge tool installed - the no-op branch is wrong here')
+})
+
 test('the template ships the packs slot (README + gitignore + public/.gitkeep)', () => {
   for (const rel of ['packs/README.md', 'packs/.gitignore', 'packs/public/.gitkeep']) {
     assert.ok(fs.existsSync(path.join(OUT, rel)), `templates/site/${rel} must exist`)

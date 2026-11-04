@@ -22,11 +22,15 @@ name: publish
 #                 release targets the tag's commit.
 #
 # This lane is stamped by `coreforge create` and is YOURS to edit. It needs a
-# package.json (the version truth) and a prepublishOnly/`test` script.
+# package.json (the version truth) and a prepublishOnly/`test` script - the
+# stamped package.json ships both, plus `prepublishOnly` (the battery that
+# rides every publish).
 #
-# One-time setup: link the package to this repo under npmjs.com -> package
-# Settings -> Publishing access (the OIDC flow needs that mapping). No secret
-# is ever created.
+# A stamped site is `"private": true` (a website is not an npm library, so the
+# registry cut is OFF until you ask for it). To publish: remove `"private"`,
+# set a scoped/owned `name`, and link the package to this repo under
+# npmjs.com -> package Settings -> Publishing access (the OIDC flow needs that
+# mapping). No secret is ever created.
 #
 # Adapt `on.push.tags` and the verify step's flags to your shape.
 
@@ -87,7 +91,7 @@ jobs:
       - name: Install (hermetic when a lockfile ships)
         run: |
           if [ -f package-lock.json ]; then npm ci --no-fund --no-audit
-          else echo "no root package-lock.json - nothing to install at the root"; fi
+          else npm install --no-fund --no-audit; fi
 
       - name: npm publish (OIDC - no token secret; skip if the registry already has this version)
         run: |
@@ -106,6 +110,12 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with: { fetch-depth: 0 }
+      # `coreforge release-notes` is the installed tool (the same package the
+      # publish job installed), so this job installs it too.
+      - name: Install (hermetic when a lockfile ships)
+        run: |
+          if [ -f package-lock.json ]; then npm ci --no-fund --no-audit
+          else npm install --no-fund --no-audit; fi
       - name: extract the release notes from the changelog (refuses empty)
         env:
           BLOCK_VERSION: ${{ needs.publish.outputs.version }}

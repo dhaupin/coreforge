@@ -61,9 +61,9 @@ jobs:
         run: npm run check && npm run lint:docs
 
       # The landing shell builds through the engine's own gates: prestruct
-      # build, then web/scripts/repair-404.cjs (the prestruct#33 assert-clean
-      # repair - any leftover $1/$2, missing description, or off-origin
-      # canonical exits 1 and red-lights this job).
+      # build (whose audit ends "0 failures"), and the engine's own 404 head
+      # (prestruct 1.2.0 closed the #33/#42 literal-$1/$2 leak, so the
+      # repair-404.cjs workaround is retired and no repair step runs here).
       - name: Install web deps
         run: npm install --prefix web --no-audit --no-fund
 

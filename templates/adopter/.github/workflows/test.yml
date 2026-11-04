@@ -5,6 +5,25 @@ name: test
 # by `coreforge create` and is yours to edit; the gates it calls live in the
 # installed `coreforge` package, so a gate fix reaches you through
 # `npm update coreforge`, not a re-copy.
+#
+# Family tool slots (the same posture coreforge's own battery carries:
+# empty = vacuous green, never false-red; a slot wakes the day its input
+# exists):
+#   packstruct - WIRED. Manifest lint over YOUR packs/ (the `packs/` slot the
+#     shell ships). An empty tree is "0 packs checked", exit 0; the first
+#     pack.json you drop in is gated from its first commit.
+#   crashtest  - WIRED-WHEN-READY. `crashtest run` without a config is a hard
+#     exit 2, so the step arm-gates on crashtest.config.js existing. Add a
+#     config (your routes/adapters) and the campaign wakes on its own.
+#   poststruct - TBA. A post-build SEO check-profile host; wake it when you
+#     want your built dist/ graded, beside the pinned tool rows.
+#   eyestruct  - TBA. Visual regression needs committed baselines
+#     (labs/.eyes/); wake it once you have a stable site worth freezing.
+#   govstruct  - n/a for a plain site (registry/compliance); it governs the
+#     FAMILY roster, not an individual stamped site.
+#
+# Pins are EXACT (a moving `latest` is a supply-chain hole). A bump moves the
+# pin here in the same commit that justifies it.
 
 on:
   push:
@@ -41,10 +60,32 @@ jobs:
       - name: Derived surfaces are current (coreforge sync --check)
         run: npx --no-install coreforge sync --check
 
+      # packstruct manifest lint over YOUR packs/ (the shell's slot), through
+      # coreforge's own wrapper verb (`coreforge lint-packs`): it resolves the
+      # repo's own install, defaults to the packs ROOT, and names the exact
+      # fix if packstruct is missing. Empty tree is a clean pass; the first
+      # pack.json is gated from its first commit.
+      - name: Install packstruct (pinned)
+        run: npm install --no-save --no-audit --no-fund packstruct@1.0.0
+
+      - name: packstruct lint packs/
+        run: npm run lint:packs
+
+      # crashtest: armed, but wakes only when YOUR site has a target. `crashtest
+      # run` with no crashtest.config.js is a hard exit 2 (missing config = "the
+      # run is wrong", never a pass), so the arm gate is the config's existence.
+      - name: Install crashtest (pinned, parked until the config lands)
+        if: ${{ hashFiles('crashtest.config.js') != '' }}
+        run: npm install --no-save --no-audit --no-fund crashtest@1.1.0
+
+      - name: Crashtest the site
+        if: ${{ hashFiles('crashtest.config.js') != '' }}
+        run: node node_modules/crashtest/bin/crashtest.js run
+
       - name: Install web deps
         run: npm install --prefix web --no-audit --no-fund
 
-      - name: Web build (prestruct prerender + 404 repair)
+      - name: Web build (prestruct prerender)
         run: npm run build --prefix web
 
       - name: Setup Ruby
