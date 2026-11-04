@@ -106,31 +106,35 @@ function frontmatterPermalink(file) {
 }
 
 test('every nav url resolves to a real docs route (the trailing-slash law)', () => {
+  // The law is one-directional, matching the checker (engine/linkcheck.js): a
+  // FLAT href (`/cli`) resolves against a directory index OR the .html
+  // sibling, so it is fine either way. A TRAILING-SLASH href (`/cli/`) is
+  // read as a directory route ONLY - index first, then the .html sibling -
+  // so it requires a directory-shaped permalink. A trailing nav link against
+  // a flat page is the real 404 (the bug this guards); the reverse is valid.
   const perms = permalinks()
   const offenders = []
   for (const url of navUrls()) {
     if (url === '/') continue // index.md
-    const trailing = url.endsWith('/')
+    if (!url.endsWith('/')) continue // a flat href resolves either shape
     const slug = url.replace(/^\/+/, '').replace(/\/+$/, '')
     const perm = perms.get(slug)
     if (perm === undefined) { offenders.push(`${url} -> no docs page named "${slug}"`); continue }
-    const permTrailing = perm.endsWith('/')
-    if (trailing !== permTrailing) {
-      offenders.push(`${url} -> docs/${slug}.md has permalink "${perm}" (${permTrailing ? 'directory' : 'flat'}), but the nav link is ${trailing ? 'directory' : 'flat'}`)
+    if (!perm.endsWith('/')) {
+      offenders.push(`${url} -> docs/${slug}.md has flat permalink "${perm}" (builds ${slug}.html); a trailing nav link needs a directory route (permalink: ${slug}/)`)
     }
   }
-  assert.deepEqual(offenders, [], `nav.yml links must match the page routes:\n${offenders.join('\n')}`)
+  assert.deepEqual(offenders, [], `nav.yml trailing-slash links must resolve to a directory route:\n${offenders.join('\n')}`)
 })
 
 test('the nav/permalink law bites: a trailing nav link against a flat permalink fails', () => {
   // The exact pre-fix shape: nav `/cli/` (directory) vs `permalink: cli`
-  // (flat, builds cli.html). The guard must refuse it.
-  const check = (url, perm) => {
-    const trailing = url.endsWith('/')
-    const permTrailing = perm.endsWith('/')
-    return trailing === permTrailing
-  }
-  assert.equal(check('/cli/', 'cli'), false, 'trailing nav link against a flat permalink must be refused')
-  assert.equal(check('/cli/', 'cli/'), true, 'trailing nav link against a directory permalink is fine')
-  assert.equal(check('/cli', 'cli'), true, 'flat nav link against a flat permalink is fine')
+  // (flat, builds cli.html). The guard must refuse it - and must NOT flag the
+  // valid reverse (flat nav link against a directory page), which eyestruct
+  // ships throughout.
+  const ok = (url, perm) => !url.endsWith('/') || perm.endsWith('/')
+  assert.equal(ok('/cli/', 'cli'), false, 'trailing nav link against a flat permalink must be refused')
+  assert.equal(ok('/cli/', 'cli/'), true, 'trailing nav link against a directory permalink is fine')
+  assert.equal(ok('/cli', 'cli/'), true, 'a flat nav link against a directory page is valid (eyestruct pattern)')
+  assert.equal(ok('/cli', 'cli'), true, 'a flat nav link against a flat page is valid')
 })
