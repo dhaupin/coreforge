@@ -13,6 +13,10 @@ lib/                    the TOOL (versioned once, imported by adopters)
   template.mjs          builds templates/site/ from the dogfood tree
   lint-packs.cjs        the packstruct wrapper verb
   ship-from-download.cjs the phone publish lane
+  release-notes.cjs     extracts the CHANGELOG section the GH release body uses
+  verify-release.cjs    the post-publish trust ladder (npm + GH release)
+  unwrap-prose.cjs      flows hard-wrapped prose in living surfaces
+  check-action-pins.cjs refuses a floating Action ref (pins, never floats)
 templates/site/         the copy source `flowforge create` stamps (GENERATED - npm run template)
 web/                    the prestruct landing shell (React/Vite, prerendered) - the dogfood
   src/styles.css        the ENTIRE design system - semantic tokens only
@@ -40,6 +44,7 @@ The tool (`lib/`) and the site (`web/` + `docs/` + `site.config.js`) are separat
 5. **Adopt explicitly, extract honestly.** New sites diff this rig and replace only brand data (tokens, nav vocabulary, pages, copy). When this rig takes a fix FROM a family repo, transcribe with receipts - never invent shapes from memory.
 6. **Determinism.** Same inputs -> same bytes for anything generated; no wall clock in shipped surfaces.
 7. **The log is the memory.** Every agent session appends its receipts to [labs/TASKS.md](./labs/TASKS.md) and versioned changes to [CHANGELOG.md](./CHANGELOG.md) - the next agent should never have to guess what happened.
+8. **Prose flow.** Living prose never hard-wraps at commit time: paragraphs flow, and `lib/unwrap-prose.cjs` joins hard-wrapped prose without touching frontmatter, fences, indented code, tables, headings, thematic breaks, or HTML blocks. Dated history keeps its era wording.
 
 ## The /packs ecosystem (the family contract)
 
@@ -55,7 +60,7 @@ npm install --prefix web && npm run build --prefix web   # "N/N pages rendered" 
 cd docs && bundle exec jekyll build                      # optional locally; CI proves it (see DEPLOY.md #22)
 ```
 
-`prepublishOnly` = `npm test && npm run check && npm run lint:docs`, so the publish ladder cannot mint a tarball from a red battery (the gate in `release.yml` additionally refuses 0.x and a tag that disagrees with the packaged version).
+`prepublishOnly` = `npm test && npm run check && npm run lint:docs && npm run lint:pins`, so the publish ladder cannot mint a tarball from a red battery (the gate in `release.yml` additionally refuses 0.x and a tag that disagrees with the packaged version, then attaches the served tarball to the release and runs the post-publish trust ladder in `lib/verify-release.cjs`).
 
 ## Version protocol (0.9.0 today)
 

@@ -6,6 +6,18 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), [SemVer](https
 
 ## [Unreleased] - staging (2026-10-29)
 
+### Canon parity: the release ladder, the phone lane, and prose flow (2026-11-04)
+
+The shell carried its own cut of the family release tooling, and the copies had drifted from the canon the nine struct-family repos now share. This brings the shell into line: the same ladder, the same phone lane, the same prose convention.
+
+- `lib/verify-release.cjs` - refreshed to the family canon. The expected-set authority is now a REAL `npm pack` of this tree (never a `--dry-run --json` parse, which some npm builds answer with empty stdout and which read as a capability failure on a clean tree); the two 1.2.0-cut regressions are fixed (`releaseTargetMatches` accepts a branch-name `target_commitish`, `registryHasVersion` waits out read-replica lag); the ladder is dry-run safe (strips `npm_config_dry_run`); and `--asset` asserts an attached release asset's sha512 equals the registry's own integrity.
+- `lib/release-notes.cjs` - the changelog-section extractor the release job feeds to the GH release body, landed for parity (refuses an absent/empty section by name).
+- `lib/ship-from-download.cjs` - the phone publish lane, refreshed: the staged `.npmrc` now carries the `_authToken` line ONLY. The deprecated `always-auth` line is dropped because npm >=9 warns "Unknown project config", and that warning reaches the child npm processes and can corrupt `npm pack --dry-run --json` on some builds.
+- `lib/check-action-pins.cjs` - the family "pins, never floats" guard, wired as `npm run lint:pins` and inside `npm run check`: every `uses:` must name a 40-hex commit SHA (a local `./path` action is exempt; a `docker://` image is refused).
+- `.github/workflows/release.yml` - the publish step is idempotent (skips when the registry already serves this version), the release job attaches the EXACT served tarball (polled, since the read replica lags), and the verify job runs the full `--npm` + `--gh --asset` trust ladder.
+- `tests/release-verify.test.cjs` + `tests/check-action-pins.test.cjs` - the canon test legs, run offline on every push.
+- `lib/unwrap-prose.cjs` + the AGENTS.md prose-flow law - the shell adopts the family flowing-prose convention: paragraphs never hard-wrap at commit time, and the tool joins them without touching frontmatter, fences, indented code, tables, headings, thematic breaks, or HTML blocks. Living prose across README/AGENTS/DEPLOY/MANIFEST/packs/labs is flowed.
+
 ### Petrol is the shell default; iris retires (2026-10-29)
 
 The shell shipped four paint schemes with iris (a flat indigo) as the default. Iris and petrol are near-identical in practice - both carry an indigo accent and the only real difference is petrol's deep-sea cast - so the default that "reads as a template" was doing no work. The family identity is petrol night / pale sea (#18), so petrol becomes the base and iris is gone: three presets remain (petrol, golden, jade), and a dau that wants the old neutral indigo can still ship it as a free-text scheme with its own block.

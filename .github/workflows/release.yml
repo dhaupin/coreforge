@@ -21,14 +21,18 @@ name: release
 #                 notes are EXTRACTED from the CHANGELOG's own [version]
 #                 section (lib/release-notes.cjs) - a release body that
 #                 disagrees with the changelog is drift, and an empty
-#                 extraction refuses the cut. Idempotent.
+#                 extraction refuses the cut. Idempotent. The EXACT served
+#                 tarball is attached to the release (polled, since the
+#                 registry read replica lags), so the release asset and the
+#                 npm artifact are the same bytes.
 #   3. verify   - the post-publish truth (lib/verify-release.cjs):
 #                 --npm registry latest == this tree's version, the served
 #                 tarball's sha512 == the registry integrity metadata,
 #                 provenance present, then the full pack ladder on the
 #                 served tarball; --gh the release object exists, targets
-#                 the tag's commit, and its source tarball diffs clean
-#                 against `git archive` of that commit.
+#                 the tag's commit, its source tarball diffs clean against
+#                 `git archive` of that commit, and (--asset) the attached
+#                 tarball's sha512 equals the registry's own integrity.
 #
 # verify-only dispatch mode: no publish, no release minting - the verify
 # job re-runs the trust ladder against what is ALREADY published.
@@ -109,10 +113,23 @@ jobs:
           if [ -f package-lock.json ]; then npm ci --no-fund --no-audit
           else echo "no root package-lock.json - nothing to install at the root"; fi
 
-      - name: npm publish (OIDC - no token secret involved)
+      # Idempotent: if the registry already has this exact version -- e.g. the
+      # release was re-fired after fixing a later workflow -- skip the publish
+      # instead of failing red on "cannot publish over the previously published
+      # version". Version drift between package.json and the registry still
+      # publishes normally.
+      - name: npm publish (OIDC - no token secret involved; skip if the registry already has this version)
         # prepublishOnly rides this automatically: npm test && npm run check
-        # && npm run lint:docs. A dirty or unproven tree cannot pack.
-        run: npm publish --provenance --access public
+        # && npm run lint:docs && npm run lint:pins. A dirty or unproven tree
+        # cannot pack.
+        run: |
+          LOCAL=$(node -p "require('./package.json').version")
+          REMOTE=$(npm view flowforge@$LOCAL version 2>/dev/null || true)
+          if [ "$REMOTE" = "$LOCAL" ]; then
+            echo "flowforge@$LOCAL already on the registry -- skipping publish"
+          else
+            npm publish --provenance --access public
+          fi
 
   release:
     needs: publish
@@ -140,6 +157,26 @@ jobs:
           else
             gh release create "$TAG" --title "flowforge $BLOCK_VERSION" --notes-file "$RUNNER_TEMP/notes.md"
           fi
+      - name: attach the served tarball to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BLOCK_VERSION: ${{ needs.publish.outputs.version }}
+          BLOCK_TAG: ${{ needs.publish.outputs.tag }}
+        run: |
+          set -e
+          # The EXACT tarball the registry serves for this version - the
+          # artifact npm received, not a re-pack of the checkout, so the
+          # release asset and the npm artifact can never drift. The verify
+          # job's --asset leg then asserts their sha512s are equal.
+          # The registry read replica can lag the publish by seconds; poll
+          # (bounded) instead of racing it (the crashtest 1.2.0 cut read
+          # ETARGET: no matching version right after publish).
+          for i in $(seq 1 24); do
+            if npm pack "flowforge@$BLOCK_VERSION" --pack-destination "$RUNNER_TEMP" > /dev/null 2>&1; then break; fi
+            if [ "$i" = "24" ]; then echo "the registry never served flowforge@$BLOCK_VERSION (24 attempts)"; exit 1; fi
+            echo "waiting for flowforge@$BLOCK_VERSION on the registry (attempt $i/24)"; sleep 5
+          done
+          gh release upload "$BLOCK_TAG" "$RUNNER_TEMP/flowforge-$BLOCK_VERSION.tgz" --clobber
 
   # No `needs` on release here by design under the if: the verify leg runs
   # after release on a real cut, but ALSO stands alone in verify-only mode
@@ -175,4 +212,4 @@ jobs:
           # --exports only when the package declares an exports map (this
           # shell has none; a library adopter does).
           node lib/verify-release.cjs --npm --version "$V" --allow "$ALLOW"
-          node lib/verify-release.cjs --gh --tag "v$V"
+          node lib/verify-release.cjs --gh --tag "v$V" --asset "flowforge-$V.tgz"
