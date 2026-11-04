@@ -17,6 +17,7 @@ const { spawnSync } = require('node:child_process')
 const fs = require('node:fs')
 const os = require('node:os')
 const path = require('node:path')
+const yaml = require('js-yaml')
 
 const GATE = path.join(__dirname, '..', 'lib', 'gates', 'check-docs-frontmatter.cjs')
 
@@ -55,4 +56,81 @@ test('an unquoted colon-space in a NON-required field is refused too (the monofo
 test('a quoted value with a colon-space is fine', () => {
   const r = run(fixture('permalink: /\nlayout: default\ntitle: "Home"\ndescription: "slots: generated"'))
   assert.equal(r.code, 0, r.out)
+})
+
+// --- The nav/permalink route law ------------------------------------------
+//
+// Jekyll resolves `permalink: cli` to `cli.html`, but `permalink: cli/` to
+// `cli/index.html`. freestruct's link checker reads a trailing-slash href as a
+// DIRECTORY route (engine/linkcheck.js: dirIndex first, then the .html
+// sibling), so a nav link `/cli/` against a page built as `cli.html` is a real
+// 404 that the strict gate catches - and a nav link that does NOT match the
+// page's own route is the class of bug that hid under the old
+// `linkCheck: false` workaround. Verified against a real Jekyll build: the
+// mismatch produced `cli.html` and the checker reported `/coreforge/cli/`
+// broken; `permalink: cli/` produces `cli/index.html` and the check is clean.
+//
+// The law: every nav.yml url that names a docs page must resolve to that
+// page's route. A trailing-slash url requires a directory-shaped permalink;
+// a bare url requires the flat .html shape. This guards the shipped nav +
+// pages (no Jekyll needed - the permalink IS the route the build will emit).
+
+const REPO = path.join(__dirname, '..')
+
+function navUrls() {
+  const nav = yaml.load(fs.readFileSync(path.join(REPO, 'docs', '_data', 'nav.yml'), 'utf8'))
+  const urls = []
+  for (const group of nav) for (const item of group.items || []) urls.push(item.url)
+  return urls
+}
+
+function permalinks() {
+  // slug -> permalink, for every top-level docs page (index.md lives at '/').
+  const map = new Map()
+  const docs = path.join(REPO, 'docs')
+  for (const e of fs.readdirSync(docs, { withFileTypes: true })) {
+    if (e.isDirectory()) {
+      const idx = path.join(docs, e.name, 'index.md')
+      if (fs.existsSync(idx)) map.set(e.name, frontmatterPermalink(idx))
+      continue
+    }
+    if (e.name.endsWith('.md') && e.name !== 'index.md') map.set(e.name.replace(/\.md$/, ''), frontmatterPermalink(path.join(docs, e.name)))
+  }
+  return map
+}
+
+function frontmatterPermalink(file) {
+  const m = fs.readFileSync(file, 'utf8').match(/^---\n([\s\S]*?)\n---/)
+  const p = (m ? m[1] : '').match(/^permalink:\s*(.+)$/m)
+  return p ? p[1].trim() : ''
+}
+
+test('every nav url resolves to a real docs route (the trailing-slash law)', () => {
+  const perms = permalinks()
+  const offenders = []
+  for (const url of navUrls()) {
+    if (url === '/') continue // index.md
+    const trailing = url.endsWith('/')
+    const slug = url.replace(/^\/+/, '').replace(/\/+$/, '')
+    const perm = perms.get(slug)
+    if (perm === undefined) { offenders.push(`${url} -> no docs page named "${slug}"`); continue }
+    const permTrailing = perm.endsWith('/')
+    if (trailing !== permTrailing) {
+      offenders.push(`${url} -> docs/${slug}.md has permalink "${perm}" (${permTrailing ? 'directory' : 'flat'}), but the nav link is ${trailing ? 'directory' : 'flat'}`)
+    }
+  }
+  assert.deepEqual(offenders, [], `nav.yml links must match the page routes:\n${offenders.join('\n')}`)
+})
+
+test('the nav/permalink law bites: a trailing nav link against a flat permalink fails', () => {
+  // The exact pre-fix shape: nav `/cli/` (directory) vs `permalink: cli`
+  // (flat, builds cli.html). The guard must refuse it.
+  const check = (url, perm) => {
+    const trailing = url.endsWith('/')
+    const permTrailing = perm.endsWith('/')
+    return trailing === permTrailing
+  }
+  assert.equal(check('/cli/', 'cli'), false, 'trailing nav link against a flat permalink must be refused')
+  assert.equal(check('/cli/', 'cli/'), true, 'trailing nav link against a directory permalink is fine')
+  assert.equal(check('/cli', 'cli'), true, 'flat nav link against a flat permalink is fine')
 })

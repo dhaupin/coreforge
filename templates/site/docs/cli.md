@@ -1,5 +1,5 @@
 ---
-permalink: cli
+permalink: cli/
 layout: default
 title: The coreforge CLI
 description: The create, sync, build, check, and doctor verbs - how a stamped site is born, kept current, and proven before it ships.
