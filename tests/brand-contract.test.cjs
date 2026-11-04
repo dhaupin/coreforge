@@ -14,6 +14,7 @@ const fs = require('node:fs')
 const os = require('node:os')
 const path = require('node:path')
 const { execFileSync } = require('node:child_process')
+const { pathToFileURL } = require('node:url')
 const yaml = require('js-yaml')
 
 const REPO = path.join(__dirname, '..')
@@ -126,6 +127,44 @@ test('ssr.config.js is a pure adapter: it has no identity literals of its own', 
 test('the one identity source is site.config.js (not a product-named config)', () => {
   assert.ok(fs.existsSync(path.join(REPO, 'site.config.js')), 'site.config.js must exist at the repo root')
   assert.ok(!fs.existsSync(path.join(REPO, 'coreforge.config.js')), 'a product-named config must not exist (PRD 5.1)')
+})
+
+// The canon shape for the generated freestruct config, as one predicate so
+// both the live file and a planted violation are judged by the same law.
+function assertFreestructConfigCanon(doc, host, baseurl) {
+  assert.equal(doc.site.url, host, 'site.url must be the origin (docs.host), never the full docs url')
+  assert.doesNotMatch(doc.site.url, /\/[a-z0-9-]+$/, 'site.url must not carry the deploy path - that is basePath')
+  assert.equal(doc.basePath, baseurl, 'basePath must be the deploy path (docs.baseurl)')
+  assert.equal(doc.linkCheck, true, 'linkCheck must be on - the basePath-aware strip (>= 1.2.0) is pinned')
+}
+
+test('the generated freestruct.config.yml is canon-shaped (origin-only url + basePath)', async () => {
+  // The regression this guards: the sync generator baked the docs path into
+  // site.url and omitted basePath - the non-canon shape. freestruct's link
+  // check then resolved every root-absolute /coreforge/... href against the
+  // output tree with no prefix to strip (freestruct#32), so --strict
+  // false-failed the whole docs lane. Canon (eyestruct/monoforge/gistory):
+  // site.url is the ORIGIN, basePath is the deploy path, linkCheck is on.
+  const site = (await import(pathToFileURL(path.join(REPO, 'site.config.js')).href)).default
+  const doc = yaml.load(fs.readFileSync(path.join(REPO, 'docs', 'freestruct.config.yml'), 'utf8'))
+  assertFreestructConfigCanon(doc, site.docs.host, site.docs.baseurl)
+})
+
+test('the canon guard bites: the pre-fix shape (path baked into url, no basePath) fails it', () => {
+  // What the generator emitted before the fix - the exact bytes that turned
+  // the docs lane red. The guard must refuse it.
+  const preFix = { site: { url: 'https://docs.creadev.org/coreforge' }, linkCheck: true }
+  assert.throws(
+    () => assertFreestructConfigCanon(preFix, 'https://docs.creadev.org', '/coreforge'),
+    /site\.url must be the origin/,
+    'a path baked into site.url must fail the canon guard'
+  )
+  // ...and an omitted basePath fails too (the other half of the pre-fix shape).
+  assert.throws(
+    () => assertFreestructConfigCanon({ site: { url: 'https://docs.creadev.org' }, linkCheck: true }, 'https://docs.creadev.org', '/coreforge'),
+    /basePath must be the deploy path/,
+    'a missing basePath must fail the canon guard'
+  )
 })
 
 test('every generated YAML surface parses (a colon in a value cannot break the docs lane)', () => {

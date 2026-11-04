@@ -6,6 +6,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), [SemVer](https
 
 ## [Unreleased] - staging (2026-10-29)
 
+### The docs-lane canon: origin-only site.url + basePath (2026-11-04)
+
+The consolidation put the whole family on one reusable docs lane, and the lane runs the strict link check by default. That turned two latent config bugs into a red `main`: **coreforge and govstruct were the only two repos whose `docs/freestruct.config.yml` baked the deploy path into `site.url` and omitted `basePath`** - the non-canon shape every other family repo (eyestruct, monoforge, gistory, crashtest, packstruct, poststruct, prestruct) had already moved off. freestruct joins `site.url + basePath + slug`, so with no `basePath` to strip, the link checker resolved every root-absolute `/coreforge/...` href against the output tree and reported it missing: 12 false-positive broken links, build failed.
+
+- **`lib/sync.mjs`** - the `docs/freestruct.config.yml` generator now emits the canon: `site.url` is the ORIGIN (`docs.host`), a new `basePath` key carries the deploy path (`docs.baseurl`), and `linkCheck: true` is explicit. This is the one-source fix - the generated file follows, and a hand edit stays drift.
+- **`docs/freestruct.config.yml`** - regenerated from `site.config.js` (the derived surface, not hand-kept).
+- **`tests/brand-contract.test.cjs`** - a new law with a fixture that breaks it: the generated config must be canon-shaped, and the guard is proven to refuse the pre-fix shape (path baked into `site.url`; missing `basePath`) - a check that never fails proves nothing.
+- **Receipts:** `npm test` 105 pass / 0 fail; `npm run check` green (sync:check, template:check, brand-census, pins all PASS).
+- **No version bump** (0.9.0 = 0.9.0); v1.0.0 is still held.
+
 ### The adopter template: family tool slots and an honest release gate (2026-11-04)
 
 A parity audit of `templates/` against the nine live family sites. The site half (`templates/site/`) was already a clean tokenized copy; the gaps were in the two tool-coupled adopter files, and in the shell's own receipts.
