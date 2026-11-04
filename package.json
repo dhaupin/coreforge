@@ -1,8 +1,8 @@
 {
-  "name": "flowforge",
+  "name": "coreforge",
   "version": "0.9.0",
   "type": "module",
-  "description": "flowforge - the shell the struct family ships sites from: landing + docs rig + CI/release plumbing, brand as data. Extracted with receipts from the deployed crashtest web/docs engine.",
+  "description": "coreforge - the shell the struct family ships sites from: landing + docs rig + CI/release plumbing, brand as data. Extracted with receipts from the deployed crashtest web/docs engine.",
   "files": [
     "lib",
     "templates",

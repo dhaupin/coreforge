@@ -42,7 +42,7 @@ function packTree(dest) {
     cwd: root, encoding: 'utf8', timeout: 180000, env: packEnv(),
   })
   assert.equal(r.status, 0, `npm pack failed: ${r.stderr}`)
-  const tgz = path.join(dest, `flowforge-${pkg.version}.tgz`)
+  const tgz = path.join(dest, `coreforge-${pkg.version}.tgz`)
   assert.ok(fs.existsSync(tgz), `npm pack produced nothing at ${tgz}`)
   return tgz
 }
@@ -64,7 +64,7 @@ test('the pack ladder verifies real npm pack output (contents + identity + consu
   assert.equal(r.status, 0, `pack ladder failed (${r.status}):\n${out}`)
   assert.ok(out.includes('PASS forbidden scan'), 'forbidden scan never ran')
   assert.ok(out.includes('PASS served set == npm pack of this tree'), 'expected-set equality never asserted')
-  assert.ok(out.includes('PASS identity: flowforge@'), 'identity line missing')
+  assert.ok(out.includes('PASS identity: coreforge@'), 'identity line missing')
   // This shell declares no main/exports/bin, so the default load probe is a
   // NAMED skip; either a real consumer PASS or that named SKIP is fine, a
   // silent absence is not.
@@ -76,12 +76,12 @@ test('the pack ladder verifies real npm pack output (contents + identity + consu
 
 test('a doctored tarball is refused BY NAME before any install', () => {
   const toy = fs.mkdtempSync(path.join(os.tmpdir(), 'ff-verify-smuggle-'))
-  fs.writeFileSync(path.join(toy, 'package.json'), JSON.stringify({ name: 'flowforge', version: pkg.version, files: ['package.json'] }, null, 2))
+  fs.writeFileSync(path.join(toy, 'package.json'), JSON.stringify({ name: 'coreforge', version: pkg.version, files: ['package.json'] }, null, 2))
   const r = spawnSync('npm', ['pack', '--pack-destination', toy], { cwd: toy, encoding: 'utf8', timeout: 120000, env: packEnv() })
   assert.equal(r.status, 0, `toy npm pack failed: ${r.stderr}`)
   const ex = path.join(toy, 'extracted')
   fs.mkdirSync(ex, { recursive: true })
-  assert.equal(spawnSync('tar', ['-xzf', path.join(toy, `flowforge-${pkg.version}.tgz`), '-C', ex], { encoding: 'utf8' }).status, 0)
+  assert.equal(spawnSync('tar', ['-xzf', path.join(toy, `coreforge-${pkg.version}.tgz`), '-C', ex], { encoding: 'utf8' }).status, 0)
   fs.mkdirSync(path.join(ex, 'package', 'models'), { recursive: true })
   fs.writeFileSync(path.join(ex, 'package', 'models', 'smuggled.bin'), 'must never ship\n')
   const doctored = path.join(toy, 'doctored.tgz')

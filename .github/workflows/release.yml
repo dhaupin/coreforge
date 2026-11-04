@@ -124,9 +124,9 @@ jobs:
         # cannot pack.
         run: |
           LOCAL=$(node -p "require('./package.json').version")
-          REMOTE=$(npm view flowforge@$LOCAL version 2>/dev/null || true)
+          REMOTE=$(npm view coreforge@$LOCAL version 2>/dev/null || true)
           if [ "$REMOTE" = "$LOCAL" ]; then
-            echo "flowforge@$LOCAL already on the registry -- skipping publish"
+            echo "coreforge@$LOCAL already on the registry -- skipping publish"
           else
             npm publish --provenance --access public
           fi
@@ -155,7 +155,7 @@ jobs:
           if gh release view "$TAG" > /dev/null 2>&1; then
             echo "release $TAG already exists - not re-minting; the verify job judges its truth"
           else
-            gh release create "$TAG" --title "flowforge $BLOCK_VERSION" --notes-file "$RUNNER_TEMP/notes.md"
+            gh release create "$TAG" --title "coreforge $BLOCK_VERSION" --notes-file "$RUNNER_TEMP/notes.md"
           fi
       - name: attach the served tarball to the release
         env:
@@ -172,11 +172,11 @@ jobs:
           # (bounded) instead of racing it (the crashtest 1.2.0 cut read
           # ETARGET: no matching version right after publish).
           for i in $(seq 1 24); do
-            if npm pack "flowforge@$BLOCK_VERSION" --pack-destination "$RUNNER_TEMP" > /dev/null 2>&1; then break; fi
-            if [ "$i" = "24" ]; then echo "the registry never served flowforge@$BLOCK_VERSION (24 attempts)"; exit 1; fi
-            echo "waiting for flowforge@$BLOCK_VERSION on the registry (attempt $i/24)"; sleep 5
+            if npm pack "coreforge@$BLOCK_VERSION" --pack-destination "$RUNNER_TEMP" > /dev/null 2>&1; then break; fi
+            if [ "$i" = "24" ]; then echo "the registry never served coreforge@$BLOCK_VERSION (24 attempts)"; exit 1; fi
+            echo "waiting for coreforge@$BLOCK_VERSION on the registry (attempt $i/24)"; sleep 5
           done
-          gh release upload "$BLOCK_TAG" "$RUNNER_TEMP/flowforge-$BLOCK_VERSION.tgz" --clobber
+          gh release upload "$BLOCK_TAG" "$RUNNER_TEMP/coreforge-$BLOCK_VERSION.tgz" --clobber
 
   # No `needs` on release here by design under the if: the verify leg runs
   # after release on a real cut, but ALSO stands alone in verify-only mode
@@ -212,4 +212,4 @@ jobs:
           # --exports only when the package declares an exports map (this
           # shell has none; a library adopter does).
           node lib/verify-release.cjs --npm --version "$V" --allow "$ALLOW"
-          node lib/verify-release.cjs --gh --tag "v$V" --asset "flowforge-$V.tgz"
+          node lib/verify-release.cjs --gh --tag "v$V" --asset "coreforge-$V.tgz"

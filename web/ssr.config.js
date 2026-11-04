@@ -4,7 +4,7 @@
  * This file is an ADAPTER, not a second source of truth: it imports the one
  * identity file and reshapes it into what prestruct expects (siteUrl, siteName,
  * routes, notFound). prestruct reads exactly what it always read, so the engine
- * needs no change and no engine depends on flowforge. Edit site.config.js, not
+ * needs no change and no engine depends on coreforge. Edit site.config.js, not
  * this file.
  *
  * Filled by `prestruct build` (inject-brand + prerender): the site's SEO tags

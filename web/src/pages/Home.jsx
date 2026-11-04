@@ -20,7 +20,7 @@ export default function Home() {
           One repo, two sites, <span className="accent">zero styling drift.</span>
         </h1>
         <p className="lede">
-          This is the flowforge rig: landing + docs + CI/release plumbing, with your
+          This is the coreforge rig: landing + docs + CI/release plumbing, with your
           brand as data. Replace the tokens, the nav vocabulary, and the copy - the
           shell carries the paid-for correctness (prerender, hydration parity,
           light/dark switch, search, pagefind, deploy workflows).

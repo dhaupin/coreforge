@@ -15,7 +15,7 @@
  *   npm i --no-save @resvg/resvg-js dejavu-fonts-ttf
  *   node scripts/og-image.mjs
  *
- * Flags (defaults are the flowforge identity; every value is brand data):
+ * Flags (defaults are the coreforge identity; every value is brand data):
  *   --mark <path>   brand-mark.json   (default web/scripts/brand-mark.json)
  *   --out <path>    png output        (default web/public/og-image.png)
  *   --paper/--surface/--raised/--ink/--soft/--accent/--line <hex>  token overrides

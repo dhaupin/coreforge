@@ -14,7 +14,7 @@
  * web/ssr.config.js and freestruct discovers docs/freestruct.config.yml - both
  * engine-owned, both DERIVED here. A product-named config would force those
  * engines to depend on this repo; this shape keeps the dependency pointing
- * from shell to engines, never the reverse. See labs/prd-__NAME__.md 5.1.
+ * from shell to engines, never the reverse. See labs/prd-flowforge.md 5.1.
  *
  * The docs identity (docs/_config.yml, freestruct.config.yml) and the landing
  * identity (ssr.config.js, robots, webmanifest) come from ONE block below, so
@@ -23,7 +23,7 @@
 export default {
   // --- identity -----------------------------------------------------------
   name: '__NAME__',
-  wordmark: { accent: 'flow', rest: 'forge' },
+  wordmark: { accent: 'core', rest: 'forge' },
   badge: 'beta',
   tagline: 'One repo, two sites, zero styling drift.',
   description:

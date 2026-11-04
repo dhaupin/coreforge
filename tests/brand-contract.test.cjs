@@ -3,7 +3,7 @@
 // Brand-contract behavior tests (Phase 0 of labs/prd-flowforge.md).
 //
 // The contract has two halves and both are exercised here for real (no mocks,
-// no network): `flowforge sync` fans site.config.js out to the surfaces that
+// no network): `coreforge sync` fans site.config.js out to the surfaces that
 // cannot import it, and the brand census gate refuses an identity literal that
 // lives anywhere else. A temp tree is built per case so a planted violation is
 // proven to fail without touching the live repo.
@@ -37,9 +37,9 @@ const tempLib = (dir, name) => path.join(dir, 'lib', name)
 // the SITE root by walking up to site.config.js, and its gates import the
 // shared lib/root.* helpers, so a temp tree mirrors the shipped layout: the
 // config at the root, the tool under lib/. That is exactly how an adopter's
-// repo looks once flowforge is installed (config above node_modules/flowforge).
+// repo looks once coreforge is installed (config above node_modules/coreforge).
 function tempTree() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'flowforge-brand-'))
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'coreforge-brand-'))
   fs.mkdirSync(path.join(dir, 'lib', 'gates'), { recursive: true })
   fs.copyFileSync(path.join(REPO, 'site.config.js'), path.join(dir, 'site.config.js'))
   fs.copyFileSync(path.join(REPO, 'lib', 'root.cjs'), path.join(dir, 'lib', 'root.cjs'))
@@ -89,7 +89,7 @@ test('sync:check FAILS when a generated surface has drifted', () => {
 test('brand census FAILS on a planted identity literal in a structural surface', () => {
   const dir = tempTree()
   // index.html is a scanned surface; plant the site name as a shipped value.
-  fs.writeFileSync(path.join(dir, 'web', 'index.html'), '<title>flowforge</title>\n')
+  fs.writeFileSync(path.join(dir, 'web', 'index.html'), '<title>coreforge</title>\n')
   const r = run(tempGate(dir, 'check-brand-census.mjs'), [], dir)
   assert.equal(r.code, 1, 'a hardcoded identity literal must fail the census')
   assert.match(r.out, /web\/index\.html:1/)
@@ -98,7 +98,7 @@ test('brand census FAILS on a planted identity literal in a structural surface',
 
 test('brand census IGNORES identity names inside comments (prose about the brand is not a hardcode)', () => {
   const dir = tempTree()
-  fs.writeFileSync(path.join(dir, 'web', 'index.html'), '<!-- flowforge receipt note -->\n<title>neutral</title>\n')
+  fs.writeFileSync(path.join(dir, 'web', 'index.html'), '<!-- coreforge receipt note -->\n<title>neutral</title>\n')
   const r = run(tempGate(dir, 'check-brand-census.mjs'), [], dir)
   assert.equal(r.code, 0, r.out)
   fs.rmSync(dir, { recursive: true, force: true })
@@ -108,10 +108,10 @@ test('brand census FAILS on a brand name in a FILENAME (invisible to a content s
   const dir = tempTree()
   // A brand name in a PATH is the literal a rebrand misses - the art master
   // shipped as flowforge-logo.jpg and had to be renamed by hand. Plant one.
-  fs.writeFileSync(path.join(dir, 'web', 'public', 'flowforge-logo.jpg'), 'not really a jpg')
+  fs.writeFileSync(path.join(dir, 'web', 'public', 'coreforge-logo.jpg'), 'not really a jpg')
   const r = run(tempGate(dir, 'check-brand-census.mjs'), [], dir)
   assert.equal(r.code, 1, 'a brand name in a filename must fail the census')
-  assert.match(r.out, /web\/public\/flowforge-logo\.jpg.*path carries identity literal/)
+  assert.match(r.out, /web\/public\/coreforge-logo\.jpg.*path carries identity literal/)
   fs.rmSync(dir, { recursive: true, force: true })
 })
 
@@ -125,7 +125,7 @@ test('ssr.config.js is a pure adapter: it has no identity literals of its own', 
 
 test('the one identity source is site.config.js (not a product-named config)', () => {
   assert.ok(fs.existsSync(path.join(REPO, 'site.config.js')), 'site.config.js must exist at the repo root')
-  assert.ok(!fs.existsSync(path.join(REPO, 'flowforge.config.js')), 'a product-named config must not exist (PRD 5.1)')
+  assert.ok(!fs.existsSync(path.join(REPO, 'coreforge.config.js')), 'a product-named config must not exist (PRD 5.1)')
 })
 
 test('every generated YAML surface parses (a colon in a value cannot break the docs lane)', () => {
@@ -141,7 +141,7 @@ test('every generated YAML surface parses (a colon in a value cannot break the d
 test('sync quotes a value containing colon+space (the YAML-nesting trap)', () => {
   const dir = tempTree()
   let cfg = fs.readFileSync(path.join(dir, 'site.config.js'), 'utf8')
-  cfg = cfg.replace("name: 'flowforge',", "name: 'flow: forge',")
+  cfg = cfg.replace("name: 'coreforge',", "name: 'flow: forge',")
   fs.writeFileSync(path.join(dir, 'site.config.js'), cfg)
   const r = run(tempLib(dir, 'sync.mjs'), [], dir)
   assert.equal(r.code, 0, r.out)

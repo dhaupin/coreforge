@@ -397,3 +397,16 @@ The shell carried its own cut of the family release tooling and it had drifted f
 - **Prose flow** - `lib/unwrap-prose.cjs` refreshed to the hardened canon and the AGENTS.md prose-flow law added. Living prose flowed across README/AGENTS/DEPLOY/MANIFEST/CHANGELOG/packs/README/labs (packs README 50 -> 22 non-blank lines, TASKS 514 -> 262, prd 266 -> 140).
 - **Receipts:** `npm test` 71 pass / 0 fail (7 release-verify + 8 pin cases new); `npm run check` green (birth-gate, theme-parity, sync, template, brand-census, action-pins); `npm run lint:docs` 6/6 PASS.
 - **No version bump** (0.9.0 = 0.9.0); a tooling-parity pass, not a released surface.
+
+---
+
+### 2026-11-03 - session: the rename lands (flowforge -> coreforge)
+
+The member formerly called `flowforge` is now **coreforge** (govstruct PRD §16.5, the first proving case). The repo is `dhaupin/coreforge`, the site `coreforge.creadev.org`, the docs `docs.creadev.org/coreforge`. It is also a collision fix: npm `flowforge` is owned by an unrelated party, so the package could never publish under that name; `coreforge` is free on npm (404) and GitHub (404).
+
+- **`site.config.js`** - the one identity source, swapped first: name, wordmark (`core`/`forge`), url, repo, docs block (host + baseurl `/coreforge`), nav, route meta. `npm run sync` then regenerated the derived surfaces (`docs/_config.yml`, `docs/freestruct.config.yml`, `web/public/robots.txt`, `web/public/site.webmanifest`), and `npm run template` re-tokenized `templates/site/` (43 files).
+- **Living references** updated across `.github/workflows/*`, `lib/*`, `tests/*`, `web/scripts/*`, `web/src/*`, `docs/`, `AGENTS.md`, `README.md`, `DEPLOY.md`; `package.json` + `web/package.json` names (`coreforge`, `coreforge-site`) and both lockfiles regenerated.
+- **Frozen receipts kept as written** - the earlier CHANGELOG sections, `MANIFEST.md`, this log's prior entries, `labs/prd-flowforge.md`, and code comments citing `flowforge#N` (issue citations are history). A comment describing the old `flowforge-logo.jpg` incident also stays - the census gate strips comments precisely because prose about the brand is not a hardcode.
+- **Theme/scheme keys are protocol constants, not brand** (`site-theme`, `site-paint-scheme`), so they were left stable across the rebrand - the same rule site.config.js documents.
+- **Verification:** `npm test` 71 pass / 0 fail; `npm run check` green (birth-gate, theme-parity, sync:check, template:check, BRAND-CENSUS PASS - 5 literals confined to site.config.js across 22 surfaces, action-pins PASS 14 refs); `npm run lint:docs` 6/6 PASS.
+- **No version bump** (0.9.0 = 0.9.0); a rename pass, not a released surface.

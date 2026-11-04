@@ -1,6 +1,6 @@
 'use strict'
 
-// Behavior tests for lib/template.mjs - the copy source `flowforge create`
+// Behavior tests for lib/template.mjs - the copy source `coreforge create`
 // stamps (Phase 1 of labs/prd-flowforge.md).
 //
 // The template is GENERATED from the live dogfood tree, so the two contracts

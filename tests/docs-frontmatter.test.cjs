@@ -21,7 +21,7 @@ const path = require('node:path')
 const GATE = path.join(__dirname, '..', 'lib', 'gates', 'check-docs-frontmatter.cjs')
 
 function fixture(frontmatter) {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'flowforge-fm-'))
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'coreforge-fm-'))
   fs.mkdirSync(path.join(root, 'docs'), { recursive: true })
   fs.writeFileSync(path.join(root, 'docs', 'index.md'), `---\n${frontmatter}\n---\n\n# page\n`)
   return root

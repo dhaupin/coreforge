@@ -1,7 +1,7 @@
 name: Docs build (reusable)
 
 # The docs lane, promoted to a reusable workflow (issue #9). The runbook it
-# encodes had been hand-copied three times across the rig (flowforge /
+# encodes had been hand-copied three times across the rig (coreforge /
 # gistory / eyestruct) and the copies had already drifted apart - Ruby 3.2
 # vs 3.4, upload-pages-artifact v3 vs v5, a pagefind scrape vs an npm pin.
 # One copy lives here; each project keeps a thin caller that sets its own

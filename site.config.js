@@ -9,7 +9,7 @@
  * literal that lives anywhere else, so "replace every YOUR... value" is
  * mechanical, not a manual hunt across three languages.
  *
- * Named site.config.js, not flowforge.config.js, on purpose: the config is
+ * Named site.config.js, not coreforge.config.js, on purpose: the config is
  * named for the CONCERN (the site), never the tool. prestruct reads
  * web/ssr.config.js and freestruct discovers docs/freestruct.config.yml - both
  * engine-owned, both DERIVED here. A product-named config would force those
@@ -22,18 +22,18 @@
  */
 export default {
   // --- identity -----------------------------------------------------------
-  name: 'flowforge',
-  wordmark: { accent: 'flow', rest: 'forge' },
+  name: 'coreforge',
+  wordmark: { accent: 'core', rest: 'forge' },
   badge: 'beta',
   tagline: 'One repo, two sites, zero styling drift.',
   description:
     'The shell the struct family ships sites from: landing + docs rig + CI/release plumbing, with brand as data.',
-  url: 'https://flowforge.creadev.org',
-  repo: 'https://github.com/dhaupin/flowforge',
+  url: 'https://coreforge.creadev.org',
+  repo: 'https://github.com/dhaupin/coreforge',
   author: 'dhaupin',
   license: 'MIT',
   keywords:
-    'flowforge, boilerplate, shell, docs, jekyll, landing-page, prerender, react, vite, github-pages, cloudflare-pages',
+    'coreforge, boilerplate, shell, docs, jekyll, landing-page, prerender, react, vite, github-pages, cloudflare-pages',
 
   // The maker line + org (footer + the docs layout's provenance row).
   maker: { label: 'Rook @ Creadev.org', url: 'https://creadev.org' },
@@ -43,10 +43,10 @@ export default {
   // docsUrl is the full public docs URL; docsHost is the Jekyll `url` (the
   // freestruct layer reads host + path separately).
   docs: {
-    title: 'flowforge docs',
-    url: 'https://docs.creadev.org/flowforge',
+    title: 'coreforge docs',
+    url: 'https://docs.creadev.org/coreforge',
     host: 'https://docs.creadev.org',
-    baseurl: '/flowforge',
+    baseurl: '/coreforge',
   },
 
   // --- theme --------------------------------------------------------------
@@ -67,7 +67,7 @@ export default {
   // renders the text link).
   nav: [
     { label: 'Home', to: '/', end: true, group: 'site' },
-    { label: 'GitHub', href: 'https://github.com/dhaupin/flowforge', group: 'out' },
+    { label: 'GitHub', href: 'https://github.com/dhaupin/coreforge', group: 'out' },
   ],
   // Footer-only extras (legal + provenance). Keep legal labels smaller than
   // the nav; provenance links belong in the footer, not the header.
@@ -86,7 +86,7 @@ export default {
       priority: '1.0',
       changefreq: 'monthly',
       meta: {
-        title: 'flowforge - the shell the struct family ships sites from',
+        title: 'coreforge - the shell the struct family ships sites from',
         description:
           'One repo, two sites, zero styling drift: the landing shell, the docs rig, and the CI/release plumbing the struct family keeps re-porting, with brand as data.',
       },
@@ -96,8 +96,8 @@ export default {
       priority: '0.3',
       changefreq: 'yearly',
       meta: {
-        title: 'Terms | flowforge',
-        description: 'Terms of use for the flowforge shell and this site.',
+        title: 'Terms | coreforge',
+        description: 'Terms of use for the coreforge shell and this site.',
       },
     },
     {
@@ -105,7 +105,7 @@ export default {
       priority: '0.3',
       changefreq: 'yearly',
       meta: {
-        title: 'Privacy | flowforge',
+        title: 'Privacy | coreforge',
         description: 'What this site collects: nothing hidden, no tracking states to find.',
       },
     },

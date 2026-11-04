@@ -6,6 +6,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), [SemVer](https
 
 ## [Unreleased] - staging (2026-10-29)
 
+### The rename: flowforge -> coreforge (2026-11-03)
+
+The shell is renamed **coreforge** (govstruct PRD §16.5). It is also a collision fix: `flowforge` on npm is owned by an unrelated party, so the package could never publish under that name; `coreforge` is free on npm and GitHub. The repo is `dhaupin/coreforge`, the site `coreforge.creadev.org`, the docs `docs.creadev.org/coreforge`.
+
+- `site.config.js` - the one identity source, swapped: name, wordmark (`core`/`forge`), url, repo, docs block, nav, route meta. `npm run sync` then regenerated the derived surfaces (`docs/_config.yml`, `docs/freestruct.config.yml`, `web/public/robots.txt`, `web/public/site.webmanifest`), and `npm run template` re-tokenized `templates/site/`.
+- Living references updated across `.github/workflows/*`, `lib/*`, `tests/*`, `web/scripts/*`, `web/src/*`, `AGENTS.md`, `README.md`, `DEPLOY.md`, `docs/`; lockfiles regenerated.
+- Frozen receipts kept as written: this changelog's earlier sections, `MANIFEST.md`, `labs/TASKS.md`, `labs/prd-flowforge.md`, and code comments citing `flowforge#N` - the rename changes what is live, never what happened.
+- No version bump (0.9.0 = 0.9.0); a rename pass, not a released surface.
+
 ### Canon parity: the release ladder, the phone lane, and prose flow (2026-11-04)
 
 The shell carried its own cut of the family release tooling, and the copies had drifted from the canon the nine struct-family repos now share. This brings the shell into line: the same ladder, the same phone lane, the same prose convention.

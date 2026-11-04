@@ -16,7 +16,7 @@ const GUARD = join(REPO_ROOT, 'lib', 'check-action-pins.cjs');
 const SHA = '11d5960a326750d5838078e36cf38b85af677262';
 
 function runGuard(files) {
-  const dir = mkdtempSync(join(tmpdir(), 'flowforge-pins-'));
+  const dir = mkdtempSync(join(tmpdir(), 'coreforge-pins-'));
   const wf = join(dir, 'workflows');
   mkdirSync(wf, { recursive: true });
   for (const [name, body] of Object.entries(files)) {

@@ -1,6 +1,6 @@
 # AGENTS.md - working conventions for agents on this repo
 
-flowforge is the **shell** the struct family ships new sites from: the landing + docs rig and the CI/release plumbing, with the brand as data. Humans are the primary audience; this file doubles as the agent cheat sheet so nobody re-learns the same lessons from scratch. See the sibling docs: [README.md](./README.md) (product + box contents), [DEPLOY.md](./DEPLOY.md) (deploy + release runbook), [CHANGELOG.md](./CHANGELOG.md) (the release log), [MANIFEST.md](./MANIFEST.md) (per-file receipts), and [labs/TASKS.md](./labs/TASKS.md) (the rolling work log).
+coreforge is the **shell** the struct family ships new sites from: the landing + docs rig and the CI/release plumbing, with the brand as data. Humans are the primary audience; this file doubles as the agent cheat sheet so nobody re-learns the same lessons from scratch. See the sibling docs: [README.md](./README.md) (product + box contents), [DEPLOY.md](./DEPLOY.md) (deploy + release runbook), [CHANGELOG.md](./CHANGELOG.md) (the release log), [MANIFEST.md](./MANIFEST.md) (per-file receipts), and [labs/TASKS.md](./labs/TASKS.md) (the rolling work log).
 
 ## Layout
 
@@ -17,7 +17,7 @@ lib/                    the TOOL (versioned once, imported by adopters)
   verify-release.cjs    the post-publish trust ladder (npm + GH release)
   unwrap-prose.cjs      flows hard-wrapped prose in living surfaces
   check-action-pins.cjs refuses a floating Action ref (pins, never floats)
-templates/site/         the copy source `flowforge create` stamps (GENERATED - npm run template)
+templates/site/         the copy source `coreforge create` stamps (GENERATED - npm run template)
 web/                    the prestruct landing shell (React/Vite, prerendered) - the dogfood
   src/styles.css        the ENTIRE design system - semantic tokens only
   src/site.js           the web bundle's accessor for site.config.js
@@ -37,7 +37,7 @@ The tool (`lib/`) and the site (`web/` + `docs/` + `site.config.js`) are separat
 
 ## House rules (each one paid for in real bugs)
 
-1. **Tokens own the palette.** Every color rides semantic variables (`--paper/--surface/--raised/--ink/--ink-soft/--accent/--moss/--err/...`); the light theme is a second block of the SAME token set; a layout class never hardcodes a hex. Re-brand = edit `site.config.js` (identity, nav, routes) + the token block. Nothing else moves: the JS surfaces import the config, and `npm run sync` regenerates the engine-owned files (`web/ssr.config.js`, `docs/freestruct.config.yml`) and the static surfaces; the brand census gate refuses a literal that lives anywhere else. `site.config.js` is concern-named on purpose - a product-named config would force prestruct/freestruct to depend on flowforge (see labs/prd-flowforge.md 5.1).
+1. **Tokens own the palette.** Every color rides semantic variables (`--paper/--surface/--raised/--ink/--ink-soft/--accent/--moss/--err/...`); the light theme is a second block of the SAME token set; a layout class never hardcodes a hex. Re-brand = edit `site.config.js` (identity, nav, routes) + the token block. Nothing else moves: the JS surfaces import the config, and `npm run sync` regenerates the engine-owned files (`web/ssr.config.js`, `docs/freestruct.config.yml`) and the static surfaces; the brand census gate refuses a literal that lives anywhere else. `site.config.js` is concern-named on purpose - a product-named config would force prestruct/freestruct to depend on coreforge (see labs/prd-flowforge.md 5.1).
 2. **Theme is one attribute.** `<html data-theme>` + a no-flash inline bootstrap; both switch icons always render (CSS picks), so prerender and hydration agree byte-for-byte. Icon is the action (sun shows in dark mode - clicking goes light), the shared family convention.
 3. **Gates fail at cause.** Every `lib/gates/check-*.cjs` names file:line. When a bug is caught twice, it becomes a gate - add a signature/check the same day, never bend a check to silence it.
 4. **Pins never float.** prestruct (npm), freestruct (workflow install), the pagefind scrape, and every GitHub Action (SHA-pinned, the human tag in a comment) are pinned in the workflow files. Bumping a pin moves the [MANIFEST.md](./MANIFEST.md) row in the SAME commit.

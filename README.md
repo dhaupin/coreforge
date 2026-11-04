@@ -1,4 +1,4 @@
-# flowforge - the creation.shell the struct family ships from
+# coreforge - the creation.shell the struct family ships from
 
 One repo, two sites, zero styling drift. This is the **rig** half of a site: the landing shell, the docs rig, and the CI/release plumbing that the struct family (dhaupin/crashtest, dhaupin/packstruct, ...) keeps rebuilding and re-porting. Every elapsed bug got paid for once, here; new adopters inherit it.
 
@@ -11,7 +11,7 @@ Status: **0.9.0, scaffold cut.** The shell ships two sites (landing + docs) and 
 | `web/`           | the landing shell: prestruct-prerendered React/Vite app, light/dark theme switch (no-flash bootstrap, icon-as-action), tokens-only palette (dark + light), nav/sidebar/footer from one vocabulary file, island engine, placeholder pages + a highlighted terminal block |
 | `docs/`          | the Jekyll rig: fixed header (search > GitHub icon > theme switch > menu), slide-out sidebar, pagefind modal search (Cmd+K), Rouge token colors shared with the landing, freestruct SEO layer, sample page proving frontmatter + highlighting |
 | `lib/`           | the TOOL, versioned once and imported by adopters: `gates/` (frontmatter, links (doubled-baseurl trap), style/voice, fiction signatures, the single-arg Liquid filter trap, theme parity, brand census, birth-gate), the `sync` fan-out, the `template` builder, the packstruct wrapper, and the phone publish lane |
-| `templates/site/` | the copy source `flowforge create` stamps - GENERATED from the dogfood by `lib/template.mjs` (`npm run template`), tokenized (`__NAME__`, `__SITE_URL__`, ...) the way monoforge tokenizes its blocks |
+| `templates/site/` | the copy source `coreforge create` stamps - GENERATED from the dogfood by `lib/template.mjs` (`npm run template`), tokenized (`__NAME__`, `__SITE_URL__`, ...) the way monoforge tokenizes its blocks |
 | `.github/workflows/` | `docs-deploy.yml` (thin caller: trigger + Pages deploy), `docs-build.yml` (reusable: Jekyll + hardened pagefind scrape + PINNED freestruct layer + Pages artifact), `release.yml` (npm Trusted Publishing OIDC template) |
 | `MANIFEST.md`    | the receipts: every extracted file -> its source repo+SHA, engine pins, and the one review rule for bumping them   |
 
@@ -23,7 +23,7 @@ Status: **0.9.0, scaffold cut.** The shell ships two sites (landing + docs) and 
 - [MANIFEST.md](./MANIFEST.md) - the receipt table (which file came from where, which pins guard which engine)
 - [labs/TASKS.md](./labs/TASKS.md) - the rolling work log (newest last)
 - [packs/README.md](./packs/README.md) - the `/packs` contract + the struct-family links (SPEC v1, the linter, the two profile hosts)
-- **The workshop** -> [Creadev.org](https://creadev.org) (flowforge is made by Rook @ Creadev.org - the same workshop as the struct family above)
+- **The workshop** -> [Creadev.org](https://creadev.org) (coreforge is made by Rook @ Creadev.org - the same workshop as the struct family above)
 
 ## The rules the family already runs on
 

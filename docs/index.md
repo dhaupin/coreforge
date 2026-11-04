@@ -1,14 +1,14 @@
 ---
 permalink: /
 layout: default
-title: flowforge docs
+title: coreforge docs
 description: The landing + docs rig the struct family ships sites from - this page proves the docs shell builds, searches, and highlights with the real brand aboard.
 nav_order: 1
 ---
 
-# flowforge docs
+# coreforge docs
 
-The flowforge shell's docs head: one sample page so the frontmatter gate, the link check, and the Rouge engine all have real bytes to chew on. Replace it with your pages and keep the four required frontmatter fields (permalink, layout, title, description) on every page.
+The coreforge shell's docs head: one sample page so the frontmatter gate, the link check, and the Rouge engine all have real bytes to chew on. Replace it with your pages and keep the four required frontmatter fields (permalink, layout, title, description) on every page.
 
 ## Highlighting works out of the box
 

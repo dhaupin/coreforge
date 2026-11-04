@@ -1,6 +1,6 @@
 {
-  "name": "flowforge",
-  "short_name": "flowforge",
+  "name": "coreforge",
+  "short_name": "coreforge",
   "description": "The shell the struct family ships sites from: landing + docs rig + CI/release plumbing, with brand as data.",
   "start_url": "/",
   "display": "standalone",
