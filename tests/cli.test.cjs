@@ -51,6 +51,15 @@ test('create + sync + doctor is a clean round trip', () => {
     assert.doesNotMatch(cfg, /__[A-Z][A-Z_]*__/);
     assert.match(cfg, /name: 'acme'/);
 
+    // The stamped docs caller points at the ONE lane in dhaupin/freestruct -
+    // never at the adopter's own author (the __AUTHOR__ token would rewrite
+    // `dhaupin` and break the ref). The lane repo is fixed for every adopter.
+    const caller = require('node:fs').readFileSync(join(dir, '.github', 'workflows', 'docs-deploy.yml'), 'utf8');
+    assert.doesNotMatch(caller, /__[A-Z][A-Z_]*__/, 'the stamped caller must carry no token');
+    assert.match(caller, /uses: dhaupin\/freestruct\/\.github\/workflows\/docs-lane\.yml@[0-9a-f]{40}/);
+    assert.ok(!existsSync(join(dir, '.github', 'workflows', 'docs-build.yml')),
+      'the adopter must not receive a forked docs lane');
+
     const synced = cli(['sync', dir]);
     assert.equal(synced.status, 0, synced.stderr);
     assert.ok(existsSync(join(dir, 'docs', '_config.yml')));

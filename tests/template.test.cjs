@@ -40,10 +40,15 @@ test('the template ships the shell (web + docs + the identity file)', () => {
   }
 })
 
-test('the template ships the per-repo CI plumbing (docs lane + caller + staging sync)', () => {
-  for (const rel of ['.github/workflows/docs-build.yml', '.github/workflows/docs-deploy.yml', '.github/workflows/staging-ff-sync.yml']) {
+test('the template ships the per-repo CI plumbing (the docs caller + staging sync)', () => {
+  for (const rel of ['.github/workflows/docs-deploy.yml', '.github/workflows/staging-ff-sync.yml']) {
     assert.ok(fs.existsSync(path.join(OUT, rel)), `templates/site/${rel} must exist`)
   }
+  // The docs lane itself is NOT stamped: it is one canonical reusable workflow
+  // in dhaupin/freestruct, and the stamped docs-deploy.yml is a thin caller of
+  // it. Shipping a fork here is the drift the consolidation removed.
+  assert.ok(!fs.existsSync(path.join(OUT, '.github/workflows/docs-build.yml')),
+    'templates/site must not ship a forked docs lane - the caller points at dhaupin/freestruct')
 })
 
 test('the template excludes the tool-coupled workflows (release + the dogfood test battery)', () => {

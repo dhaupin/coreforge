@@ -181,6 +181,7 @@ function create(root) {
     ['__WORDMARK__', `{ accent: '${site.wordmarkAccent}', rest: '${site.wordmarkRest}' }`],
     ['__NAME__', site.name],
     ['__AUTHOR__', site.author],
+    ['__LANE_REPO__', 'dhaupin/freestruct'],
     ['__COREFORGE_VERSION__', pkg.version],
   ]
   const fill = (text) => {

@@ -33,7 +33,7 @@ web/                    the prestruct landing shell (React/Vite, prerendered) - 
 docs/                   the Jekyll docs rig - the dogfood
   _layouts/default.html header, sidebar, pagefind search, theme tokens
   _data/nav.yml         (yours to add) - sidebar sections come from here
-.github/workflows/      docs-deploy.yml (Pages, thin caller) + docs-build.yml (reusable lane) + publish.yml (npm OIDC) + test.yml (the shell battery) + staging-ff-sync.yml
+.github/workflows/      docs-deploy.yml (a thin caller of the one docs lane in dhaupin/freestruct) + publish.yml (npm OIDC) + test.yml (the shell battery) + staging-ff-sync.yml
 labs/TASKS.md           the rolling work log - append entries as you ship
 MANIFEST.md             every extracted file -> source SHA + engine pins
 packs/README.md         the /packs contract (see below) - packs live in packs/public/<name>/

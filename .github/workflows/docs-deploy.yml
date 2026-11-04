@@ -1,29 +1,33 @@
-name: Deploy Docs
-
-# Thin caller for the reusable docs lane (issue #9). The build runbook -
-# Jekyll, the hardened pagefind scrape, the pinned freestruct post-build SEO
-# layer, the Pages artifact upload - lives ONCE in docs-build.yml; this file
-# keeps only what is per-repo: the trigger, the permissions, the concurrency
-# group, and the deploy job. The hand-copied runbooks this replaces had
-# already drifted apart; the lane is now a versioned call, not a fourth copy.
+# Deploy Docs - a THIN caller of THE one docs lane (dhaupin/freestruct).
 #
-# The deploy job stays gated to main (issue #30, point 3 - the trap): once
-# staging is in the push trigger, the trigger no longer keeps its content out
-# of production; this guard does. workflow_dispatch is likewise held to main
-# unless deliberately overridden.
+# This repo used to carry its own reusable lane (docs-build.yml) and a thin
+# caller (docs-deploy.yml). That fork was the same runbook as freestruct's
+# docs-lane.yml and the two had drifted (ruby 3.2 vs 3.4, pagefind `latest`
+# scrape vs npm pin). The fork is gone: the family builds docs from ONE lane,
+# and this repo is a caller like every sibling (the consolidation).
+#
+# What the caller owns: the trigger, the permissions (the caller grants the
+# pages: write + id-token: write ceiling the deploy half needs), the
+# concurrency group, and the input pins that are this repo's (ruby 3.4 - the
+# Gemfile's bigdecimal note is a Ruby 3.4 fact; the engine pinned EXACT, never
+# a range). The lane owns the runbook, the pinned tool installs, and the
+# main-gated deploy job.
+#
+# The docs baseurl is generated from site.config.js (see docs/_config.yml);
+# set the Pages custom domain once in the repo's Pages settings.
+
+name: Deploy Docs
 
 on:
   push:
     # staging validates the docs build too (a docs change that breaks the
     # build should red-light on the integration branch, not surprise the
-    # promotion); the deploy job below is gated to main.
+    # promotion); the lane's deploy job is gated to main, so staging never
+    # publishes.
     branches: [main, staging]
-    paths: ['docs/**', '.github/workflows/docs-deploy.yml', '.github/workflows/docs-build.yml']
+    paths: ['docs/**', '.github/workflows/docs-deploy.yml']
   workflow_dispatch:
 
-# Permissions for GitHub Pages deployment. The called workflow inherits this
-# ceiling (it declares contents: read for itself); the deploy half needs
-# pages: write + id-token: write, which only the caller can grant.
 permissions:
   contents: read
   pages: write
@@ -34,21 +38,10 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
-    uses: ./.github/workflows/docs-build.yml
-
-  deploy:
-    needs: build
-    # Deploy ONLY from main (issue #30, point 3 - the trap): once staging is
-    # in the push trigger above, the trigger no longer keeps its content out
-    # of production; this guard does. workflow_dispatch is likewise held to
-    # main unless deliberately overridden.
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5
+  docs:
+    # Pinned to the lane's SHA (pins, never floats): a moving @main would let
+    # the runbook change under us between runs.
+    uses: dhaupin/freestruct/.github/workflows/docs-lane.yml@22bb7e9b2634d6cdd966963d9e25c7f892577276 # main
+    with:
+      ruby-version: '3.4'
+      freestruct-version: '1.2.0'

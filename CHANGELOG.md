@@ -6,6 +6,18 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), [SemVer](https
 
 ## [Unreleased] - staging (2026-10-29)
 
+### The docs-lane consolidation: one lane, no fork (2026-11-04)
+
+The shell shipped its own reusable docs lane (`docs-build.yml`). That fork was the same runbook as `dhaupin/freestruct`'s `docs-lane.yml`, and the two had already drifted - ruby 3.2 vs 3.4, a pagefind `latest` scrape vs an npm pin, no `strict`, no crashtest gate. The exact disease the lanes were built to cure, recreated one level up. The fork is gone: the family builds docs from ONE lane, and the shell is a caller like every sibling.
+
+- **`.github/workflows/docs-build.yml`** - deleted. Its receipts (the hardened pagefind scrape, the pinned freestruct install) now live in the one lane.
+- **`.github/workflows/docs-deploy.yml`** - now a thin caller: `uses: dhaupin/freestruct/.github/workflows/docs-lane.yml@<sha>`, with `ruby-version: '3.4'` (the Gemfile's `bigdecimal` note is a Ruby 3.4 fact) and `freestruct-version: '1.2.0'` (exact, never a range). The caller owns the trigger, permissions, concurrency, and its input pins; the lane owns the runbook, the pinned tool installs, and the main-gated deploy job.
+- **`templates/site/`** - stops shipping a forked lane (51 files, was 52). A stamped site gets the thin caller, not a copy; `tests/template.test.cjs` asserts `docs-build.yml` is ABSENT, so the drift cannot return through the template.
+- **`lib/check-action-pins.cjs`** - the opt-in `--verify-tags` slug now takes the first two path segments, so a cross-repo reusable ref (`owner/repo/.github/workflows/x.yml@sha`) resolves to the right repo.
+- **README / DEPLOY.md / AGENTS.md** - the docs-lane story now names the one lane and the caller shape.
+- **Receipts:** `npm test` 91 pass / 0 fail; `npm run check` green (birth-gate 4 workflows, 9 pins, reusable call verified); `npm run lint:docs` 6/6 PASS; `template:check` PASS (51 files).
+- **No version bump** (0.9.0 = 0.9.0); a workflow consolidation, not a released surface.
+
 ### The `create` CLI and the template's tool-coupling (2026-11-04)
 
 Phase 2 of the shell: the `coreforge` command exists. `bin/coreforge.mjs` ships the five site verbs (PRD §6 - `create` / `sync` / `build` / `check` / `doctor`) plus three release verbs (`verify-release` / `release-notes` / `lint-packs`) that forward to the `lib/` scripts the family's `publish.yml` already calls. The load-bearing law is monoforge's: generated green is never shipped - `doctor` refuses placeholder residue, a stale derived surface, and a failing gate, and an unfilled slot is a failure, not a warning.

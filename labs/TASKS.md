@@ -444,3 +444,21 @@ The shell's Phase 2 landed: the `coreforge` command exists, and the two tool-cou
 - **Template token gaps - CLOSED.** The wordmark composite `__WORDMARK__` token (from the prior session) plus the `site.config.js` comment fix; `create`'s residue guard and the `VERBATIM` set leave no residual leak. `npm run template` green (52 files).
 - **Receipts:** `npm test` 91 pass / 0 fail (7 CLI + 2 pin cases new); `npm run check` green (birth-gate 5 workflows / 14 pins, brand census, sync:check, template:check, theme parity, language); `npm run lint:docs` 6/6 PASS; a temp-dir `create` -> `sync` -> `doctor` round trip is PASS.
 - **No version bump** (0.9.0 = 0.9.0). v1.0.0 is NOT cut - functional first, per the session constraint.
+
+---
+
+### 2026-11-04 - session: the docs-lane consolidation (coreforge delegates)
+
+SUPERSEDES the "Docs-lane topology - DECIDED: leave it alone" note above. That note recorded the pre-consolidation call. Owner then chose the full consolidation: one docs lane, no drift. coreforge no longer ships a fork.
+
+- **`.github/workflows/docs-build.yml` DELETED.** It was a fork of `dhaupin/freestruct`'s `docs-lane.yml` under a second name, and the two had drifted (ruby 3.2 vs 3.4, pagefind `latest` scrape vs npm pin, no `strict`, no crashtest gate). One lane now.
+- **`.github/workflows/docs-deploy.yml`** - now a thin caller: `uses: dhaupin/freestruct/.github/workflows/docs-lane.yml@<sha>` with `ruby-version: '3.4'` (the Gemfile's bigdecimal note is a 3.4 fact) and `freestruct-version: '1.2.0'` (exact, never a range). The lane owns the runbook, the pinned tool installs, and the main-gated deploy job.
+- **`templates/site/`** - no longer ships a forked lane (51 files, was 52). The stamped `docs-deploy.yml` is the same thin caller; an adopter gets one lane, not a copy. `tests/template.test.cjs` now ASSERTS the absence of `docs-build.yml` (the drift cannot come back through the template).
+- **`lib/check-action-pins.cjs`** - the opt-in `--verify-tags` slug derivation now takes the first two path segments, so a cross-repo reusable ref (`owner/repo/.github/workflows/x.yml@sha`) resolves to the right repo (was `owner/repo/.github`, which would never resolve).
+- **`lib/template.mjs` + `bin/coreforge.mjs`** - a `__LANE_REPO__` token (filled to `dhaupin/freestruct`) protects the fixed engine repo: without it the `__AUTHOR__` token rewrote `dhaupin` in the stamped caller and broke the ref for every adopter. `tests/cli.test.cjs` asserts the stamped caller names `dhaupin/freestruct` at a 40-hex SHA and carries no token.
+- **Docs updated:** README (workflows + templates/site rows), DEPLOY.md section 2, AGENTS.md layout.
+- **Receipts:** `npm test` 91 pass / 0 fail; `npm run check` green (birth-gate 4 workflows, 9 pins, reusable call verified); `npm run lint:docs` 6/6 PASS; `template:check` PASS (51 files); a `create` smoke test stamps the caller at `dhaupin/freestruct@<sha>` with no residue.
+- **No version bump** (0.9.0 = 0.9.0); a workflow consolidation, not a released surface.
+
+
+- **The pin guard now scans `action.yml` (2026-11-04 sweep).** The family pin guard (`scripts/check-action-pins.cjs`) scanned only `.github/workflows/`, so a floating `uses:` in a repo-root composite Action manifest went unseen. crashtest's `action.yml` (the gate other repos add) carried `actions/setup-node@v6` and `actions/upload-artifact@v6` plus a duplicated `default:` key; both are now pinned and the key is gone. The guard scans the manifest alongside the workflows, and its battery proves the new leg bites. Sweep finding; no version bump.
