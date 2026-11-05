@@ -21,6 +21,10 @@ packs/local/<pack-name>/      gitignored, private packs (same semantics,
 - **packstruct** is also the linter: `packstruct lint <packs-dir>` enforces the manifest grammar + directory contract (exit 0 conforming / 1 violations / 2 usage error). Adopting repos pin the SPEC commit and wire the lint lane in CI - see __AUTHOR__/crashtest's lane for the working shape (pinned-SHA clone, lint + receipt byte-compare).
 - **__AUTHOR__/crashtest** is the `scenario`-profile reference implementation: its loaders execute hostile scenarios in-process against a fake transport (the fake transport IS the product - zero sockets), and its docs + packs (`packs/public/*/pack.json`) double as the real-world corpus packstruct lints against.
 - **__AUTHOR__/poststruct** is the `check`-profile sibling: declarative, pure-reading verifiers over files on disk. It is queued on the same SPEC; its birth thread reserves its column in the shared refusal matrix.
+- **__AUTHOR__/eyestruct** is the `check`-profile capture lane: it loads `eye-shapes` / `eye-text-leg` / `eye-ci-gate` through the same pinned SPEC, conformance-checked at load, so its `implements: packstruct@1` pin is verifiable rather than honorary.
+- **__AUTHOR__/govstruct** is the govern arm: it holds `registry.v1.json` and `members/<id>.json` - the family roster this rig's site half is a member of. It lints its own pack battery through the same SPEC and publishes the per-member conformance status the family reads.
+
+The two forges compose a member's two halves and are not arms themselves: **__NAME__** (this rig) rigs the site half, **monoforge** stamps the repo half, and **railyard** composes them.
 
 ## Shell rules for this directory
 
