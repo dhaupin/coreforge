@@ -6,6 +6,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), [SemVer](https
 
 ## [Unreleased] - staging (2026-10-29)
 
+### The link gate refuses page-relative links; the Ruby leg is one version (2026-11-04)
+
+A family-wide sweep of the docs link gates found one shared blind spot and one stale drift.
+
+- **`lib/gates/check-docs-links.cjs`** - a page-relative link (`./x`, `../x`) was resolved against the SOURCE tree, which always holds the file, so a served-broken link never bit. On a no-trailing-slash permalink page the browser reads `<baseurl>/foo` as a FILE and resolves the relative target one level off - a real 404 (the gistory + poststruct `discussions` break, found in the family-wide crawl). Internal links are root-absolute; the gate now refuses the relative shape by name. This gate ships to every adopter via `coreforge check`, so the fix reaches them by `npm update`.
+- **`tests/docs-links.test.cjs`** (new) - proves the leg bites: a root-absolute link to a real page passes, `./x` and `../x` are refused by name, and an external link is the author's business.
+- **`.github/workflows/test.yml` + `templates/adopter/.github/workflows/test.yml`** - the docs Jekyll build ran on Ruby **3.2** while the docs lane (`docs-deploy.yml`) and the Gemfile note run **3.4** (bigdecimal is a 3.4 bundled gem). That is the exact drift the docs-lane consolidation removed, left stale in the battery; both legs now build on 3.4.
+- **`tests/workflow-ruby-parity.test.cjs`** (new) - holds every Ruby leg in the tree (dogfood + adopter template, test + docs lanes) to ONE version, so the drift cannot come back silently.
+- **Receipts:** `npm test` 111 pass / 0 fail; `npm run check` green (sync:check, template:check, brand-census, pins, language all PASS); `npm run lint:docs` 6/6 PASS.
+- **No version bump** (0.9.0 = 0.9.0); v1.0.0 is still held.
+
 ### The docs-lane canon: origin-only site.url + basePath (2026-11-04)
 
 The consolidation put the whole family on one reusable docs lane, and the lane runs the strict link check by default. That turned two latent config bugs into a red `main`: **coreforge and govstruct were the only two repos whose `docs/freestruct.config.yml` baked the deploy path into `site.url` and omitted `basePath`** - the non-canon shape every other family repo (eyestruct, monoforge, gistory, crashtest, packstruct, poststruct, prestruct) had already moved off. freestruct joins `site.url + basePath + slug`, so with no `basePath` to strip, the link checker resolved every root-absolute `/coreforge/...` href against the output tree and reported it missing: 12 false-positive broken links, build failed.

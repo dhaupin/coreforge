@@ -72,7 +72,7 @@ The tool half of the split: the code that is versioned once and reaches an adopt
 | file                        | receipt                                                                                      |
 | --------------------------- | -------------------------------------------------------------------------------------------- |
 | `check-docs-frontmatter.cjs` | byte-exact copy (gate: 4 required fields, baseurl-relative permalinks)                       |
-| `check-docs-links.cjs`      | extracted; `SITE_PREFIX` now a one-line constant to mirror your baseurl                        |
+| `check-docs-links.cjs`      | extracted; `SITE_PREFIX` now a one-line constant to mirror your baseurl. 2026-11-04 (the family link-gate sweep): a page-relative link (`./x`, `../x`) was resolved against the SOURCE tree, which always holds the file, so a served-broken link never bit - the gate now refuses the relative shape by name (internal links are root-absolute). `tests/docs-links.test.cjs` proves the leg bites. This gate ships to every adopter via `coreforge check`. |
 | `check-docs-style.cjs`      | byte-exact copy (voice/hyphen rules)                                                          |
 | `check-fiction-signatures.cjs` | same scanner logic; seed signatures are GENERIC - seed your own the moment a fiction is caught twice |
 | `check-jekyll-filters.cjs`  | byte-exact copy (the two-arg single-arg Liquid filter trap - found live in packstruct CI, crashtest#23) |

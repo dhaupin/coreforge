@@ -72,11 +72,13 @@ jobs:
 
       # Jekyll build of docs/ (PR coverage the docs-deploy lane doesn't give -
       # that workflow runs on main pushes only). Ruby deps ride the Gemfile;
-      # bigdecimal is declared there on purpose (Ruby 3.4 bundled gem).
+      # bigdecimal is declared there on purpose (Ruby 3.4 bundled gem). Ruby
+      # 3.4 matches the docs lane (docs-deploy.yml) and the Gemfile note - the
+      # old 3.2 here was the retired docs-build.yml fork's drift.
       - name: Setup Ruby
         uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
         with:
-          ruby-version: '3.2'
+          ruby-version: '3.4'
           bundler-cache: true
           working-directory: './docs'
 
