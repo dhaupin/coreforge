@@ -6,6 +6,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), [SemVer](https
 
 ## [Unreleased] - staging (2026-10-29)
 
+### The Jekyll filter gate refuses unknown Liquid tags (2026-11-04)
+
+The docs gate refused the two-argument single-arg filter trap but not the other build-time construct class: an UNKNOWN tag. `{% seo %}` written in prose kills the Jekyll build ("Unknown tag 'seo' in packs.md") because this repo's docs ship no theme gem and no jekyll-seo-tag plugin - backticks are markdown, not Liquid escaping, so the tag still parses. This is the one rule eyestruct's and govstruct's vendored copies already carried; the rig's copy lacked it.
+
+- `lib/gates/check-jekyll-filters.cjs` - a second rule: any tag outside the Jekyll 4.x set refuses with a file:line, and `{% raw %}` regions are blanked (line count preserved, so `file:line` stays honest) so a literal example survives. The tool half carries the rule to every adopter by `npm update`; no vendored copy ships in the template.
+- `tests/jekyll-filters.test.cjs` (new) - five legs: the repo's own docs pass, an unknown tag refuses by name, a `{% raw %}`-wrapped literal is exempt, the two-arg filter rule still refuses, and a known tag passes (the set is not over-refused).
+
 ### The link gate refuses page-relative links; the Ruby leg is one version (2026-11-04)
 
 A family-wide sweep of the docs link gates found one shared blind spot and one stale drift.
