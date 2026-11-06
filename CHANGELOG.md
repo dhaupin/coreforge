@@ -6,6 +6,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), [SemVer](https
 
 ## [Unreleased] - staging (2026-10-29)
 
+### Changed
+
+- **Family engine pins advance to the current cuts.** `test.yml` installs `packstruct@1.0.0 -> 1.1.0` and `crashtest@1.1.0 -> 1.3.0`; the docs lane's caller SHA moves to freestruct v1.3.0 (`7dfb172`) with `freestruct-version` `1.2.0 -> 1.3.0`; and the shell's `web/` + the `templates/site` web app move `prestruct ^1.2.0 -> ^1.3.0`. The `MANIFEST.md` engine-pin rows move in the same commit.
+- **The family prestruct floor moves to `^1.3.0`.** `lib/check-prestruct-pins.cjs` refuses any declaration below 1.3.0 (the SSRF-guard security round), and the guard's own battery gains the inverse case - the old `^1.2.0` floor now fails.
+
 ### Fixed
 
 - **The release ladder's `verify` job no longer races `release`.** `verify` now declares `needs: [publish, release]`, so it waits for the GH release object and its attached tarball before judging them. A bare `needs: publish` ran `verify` CONCURRENTLY with `release`: on a fresh cut the registry read replicas had not settled and the asset was not yet attached, so a publish that in fact succeeded failed red and needed a manual re-run (the packstruct 1.1.0 first cut). `verify` still stands alone in verify-only mode (`publish` and `release` both skipped). The propagation poll budgets also widened: the release-attach poll 120s -> 300s, and the registry poll in `lib/verify-release.cjs` 120s -> 360s. `tests/release-verify.test.cjs` pins the dependency so a regression fails by name.
