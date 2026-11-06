@@ -6,6 +6,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), [SemVer](https
 
 ## [Unreleased] - staging (2026-10-29)
 
+### Fixed
+
+- **The release ladder's `verify` job no longer races `release`.** `verify` now declares `needs: [publish, release]`, so it waits for the GH release object and its attached tarball before judging them. A bare `needs: publish` ran `verify` CONCURRENTLY with `release`: on a fresh cut the registry read replicas had not settled and the asset was not yet attached, so a publish that in fact succeeded failed red and needed a manual re-run (the packstruct 1.1.0 first cut). `verify` still stands alone in verify-only mode (`publish` and `release` both skipped). The propagation poll budgets also widened: the release-attach poll 120s -> 300s, and the registry poll in `lib/verify-release.cjs` 120s -> 360s. `tests/release-verify.test.cjs` pins the dependency so a regression fails by name.
+
+
 ### The Jekyll filter gate refuses unknown Liquid tags (2026-11-04)
 
 The docs gate refused the two-argument single-arg filter trap but not the other build-time construct class: an UNKNOWN tag. `{% seo %}` written in prose kills the Jekyll build ("Unknown tag 'seo' in packs.md") because this repo's docs ship no theme gem and no jekyll-seo-tag plugin - backticks are markdown, not Liquid escaping, so the tag still parses. This is the one rule eyestruct's and govstruct's vendored copies already carried; the rig's copy lacked it.
