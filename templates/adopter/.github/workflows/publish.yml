@@ -143,15 +143,21 @@ jobs:
           # The EXACT tarball the registry serves - not a re-pack of the
           # checkout, so the release asset and the npm artifact never drift.
           # Poll (bounded): the registry read replica lags the publish.
-          for i in $(seq 1 24); do
+          for i in $(seq 1 60); do
             if npm pack "$NAME@$BLOCK_VERSION" --pack-destination "$RUNNER_TEMP" > /dev/null 2>&1; then break; fi
-            if [ "$i" = "24" ]; then echo "the registry never served $NAME@$BLOCK_VERSION (24 attempts)"; exit 1; fi
-            echo "waiting for $NAME@$BLOCK_VERSION on the registry (attempt $i/24)"; sleep 5
+            if [ "$i" = "60" ]; then echo "the registry never served $NAME@$BLOCK_VERSION (60 attempts)"; exit 1; fi
+            echo "waiting for $NAME@$BLOCK_VERSION on the registry (attempt $i/60)"; sleep 5
           done
           gh release upload "$BLOCK_TAG" "$RUNNER_TEMP/$NAME-$BLOCK_VERSION.tgz" --clobber
 
+  # The verify leg judges what the registry and GitHub actually serve, so it
+  # must wait for release to cut the object and attach the tarball - a bare
+  # `needs: publish` let verify race release and red-flag a cut that landed
+  # (the packstruct 1.1.0 first run). It ALSO stands alone in verify-only mode
+  # (publish skipped, release skipped, the ladder judged against what is
+  # already served and released).
   verify:
-    needs: publish
+    needs: [publish, release]
     if: >-
       always() &&
       (needs.publish.result == 'success' ||
