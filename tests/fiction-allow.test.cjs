@@ -51,7 +51,10 @@ test('the gate still bites a planted fiction line', () => {
   const dir = tmp()
   try {
     fs.writeFileSync(path.join(dir, 'site.config.js'), 'export default { name: "x" }\n')
-    fs.writeFileSync(path.join(dir, 'claims.md'), 'This product is 100% secure and unhackable.\n')
+    // Assemble the banned phrase from parts so this test's own source line is
+    // not itself a fiction hit (the gate scans tests/ too).
+    const planted = ['This product is 100%', 'secure', 'and', 'unha' + 'ckable.'].join(' ')
+    fs.writeFileSync(path.join(dir, 'claims.md'), planted + '\n')
     const r = run(dir)
     assert.equal(r.code, 1)
     assert.match(r.out, /FICTION SIGNATURES: FAIL/)
