@@ -86,6 +86,43 @@ test('the template ships a .gitignore', () => {
   assert.ok(fs.existsSync(path.join(OUT, '.gitignore')), 'templates/site/.gitignore must exist')
 })
 
+test('the template ships NEUTRAL placeholder art, never the shell\'s own brand', () => {
+  // The leak: binary art cannot be tokenized, so a plain copy shipped
+  // coreforge's mark (and its brand/logo.jpg master) into every stamped site.
+  // The generator excludes the shell's art; the template carries a neutral
+  // placeholder instead. This fixture fails if a rebuild re-leaks it.
+  assert.ok(!fs.existsSync(path.join(OUT, 'web', 'public', 'brand', 'logo.jpg')),
+    'the shell brand master must not ship in the template')
+  for (const rel of ['web/public/icon.svg', 'web/public/icon-512.png', 'web/public/og-image.png', 'web/scripts/brand-mark.json']) {
+    const tpl = path.join(OUT, rel)
+    const dog = path.join(ROOT, rel)
+    assert.ok(fs.existsSync(tpl), `templates/site/${rel} must exist (the placeholder)`)
+    if (fs.existsSync(dog)) {
+      assert.ok(!fs.readFileSync(tpl).equals(fs.readFileSync(dog)),
+        `templates/site/${rel} must NOT be byte-identical to the dogfood's brand art`)
+    }
+  }
+})
+
+test('the template art separation guard bites (a clobbered placeholder fails)', () => {
+  // House law: a new law ships with a fixture that breaks it. Simulate the
+  // leak by overwriting a placeholder with the dogfood's bytes, then prove
+  // `template:check` refuses it; restore the placeholder afterward.
+  const rel = 'web/public/icon-512.png'
+  const tpl = path.join(OUT, rel)
+  const dog = path.join(ROOT, rel)
+  if (!fs.existsSync(dog)) return // no dogfood art to clobber with
+  const keep = fs.readFileSync(tpl)
+  try {
+    fs.writeFileSync(tpl, fs.readFileSync(dog))
+    const r = run(['--check'])
+    assert.equal(r.code, 1, 'a clobbered placeholder must fail template:check')
+    assert.match(r.out, /brand-art leak/)
+  } finally {
+    fs.writeFileSync(tpl, keep)
+  }
+})
+
 test('the template carries no identity literal of the dogfood brand (only tokens)', async () => {
   const site = (await import(pathToFileURL(path.join(ROOT, 'site.config.js')).href)).default
   const literals = [site.name, site.author, site.docs.url, site.url]

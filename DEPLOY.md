@@ -8,6 +8,16 @@ The build command is `prestruct build` (via `npm run build --prefix web`); it co
 
 Healthy = the build's last line reads `N/N pages rendered` with N equal to your routes, and no `screen/style` bloat errors. That is the same gate the family's CI runs.
 
+**Brand art ships as a neutral placeholder.** The icon (`web/public/icon.svg` + the PNG ladder), the OG card (`web/public/og-image.png`), the docs icon (`docs/icon.svg`), and `web/scripts/brand-mark.json` are placeholders - the shell's own mark is never stamped. Replace them with your own art:
+
+```bash
+cd web && npm install --no-save sharp potrace @resvg/resvg-js
+node scripts/adopt-icons.mjs --art public/brand/logo.png   # trace your art -> icon ladder
+node scripts/og-image.mjs                                  # redraw the OG card from brand-mark.json
+```
+
+The old card and icons are only placeholder bytes; `template:check` guarantees they are never the shell's own.
+
 ## 2. The docs (`docs/`, Jekyll + pagefind)
 
 GitHub Pages territory: `.github/workflows/docs-deploy.yml` is a thin caller of THE one docs lane (`dhaupin/freestruct`'s `.github/workflows/docs-lane.yml`), which runs gates -> Jekyll -> freestruct (pinned) -> pagefind -> Pages artifact upload. Set `docs/_config.yml`'s `url` + `baseurl` to YOUR deploy location FIRST - the layout composes canonical/OG/pagefind/logo paths from it. Without the pagefind index the search modal reports that honestly (it never pretends to search). The `paths:` filter means the workflow only fires on `docs/**` changes, so landing edits never cost a docs deploy.

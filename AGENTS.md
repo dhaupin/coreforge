@@ -10,6 +10,7 @@ bin/coreforge.mjs       the CLI: create / sync / build / check / doctor (+ the r
 lib/                    the TOOL (versioned once, imported by adopters)
   gates/                the check-*.cjs family (frontmatter/links/style/fiction/liquid/theme/language/birth/census)
   root.cjs / root.mjs   resolve the SITE root (walk up to site.config.js)
+  identity.mjs          validates site.config.js's shape (url/docs.host/docs.url/docs.baseurl)
   sync.mjs              fans the identity out to the non-JS surfaces
   template.mjs          builds templates/site/ from the dogfood tree
   lint-packs.cjs        the packstruct wrapper verb
@@ -47,10 +48,11 @@ The tool (`lib/`) and the site (`web/` + `docs/` + `site.config.js`) are separat
 2. **Theme is one attribute.** `<html data-theme>` + a no-flash inline bootstrap; both switch icons always render (CSS picks), so prerender and hydration agree byte-for-byte. Icon is the action (sun shows in dark mode - clicking goes light), the shared family convention.
 3. **Gates fail at cause.** Every `lib/gates/check-*.cjs` names file:line. When a bug is caught twice, it becomes a gate - add a signature/check the same day, never bend a check to silence it.
 4. **Pins never float.** prestruct (npm), freestruct (workflow install), the pagefind scrape, and every GitHub Action (SHA-pinned, the human tag in a comment) are pinned in the workflow files. Bumping a pin moves the [MANIFEST.md](./MANIFEST.md) row in the SAME commit.
-5. **Adopt explicitly, extract honestly.** New sites diff this rig and replace only brand data (tokens, nav vocabulary, pages, copy). When this rig takes a fix FROM a family repo, transcribe with receipts - never invent shapes from memory.
-6. **Determinism.** Same inputs -> same bytes for anything generated; no wall clock in shipped surfaces.
-7. **The log is the memory.** Every agent session appends its receipts to [labs/TASKS.md](./labs/TASKS.md) and versioned changes to [CHANGELOG.md](./CHANGELOG.md) - the next agent should never have to guess what happened.
-8. **Prose flow.** Living prose never hard-wraps at commit time: paragraphs flow, and `lib/unwrap-prose.cjs` joins hard-wrapped prose without touching frontmatter, fences, indented code, tables, headings, thematic breaks, or HTML blocks. Dated history keeps its era wording.
+5. **Adopt explicitly, extract honestly.** New sites diff this rig and replace only brand data (tokens, nav vocabulary, pages, copy). When this rig takes a fix FROM a family repo, transcribe with receipts - never invent shapes from memory. The identity must be well-formed before it fans out: `lib/identity.mjs` refuses a scheme-less `docs.host` (a scheme-less value bakes a broken-link failure into the docs lane), and `create` validates before it writes, so a bad answer set stamps nothing.
+6. **The stamp ships NEUTRAL brand art.** Binary art cannot be tokenized, so `lib/template.mjs` excludes the shell's own mark (`EXCLUDE_ART`) and ships the hand-kept placeholder in `templates/site/` instead; a separation guard refuses a rebuild that made any placeholder byte-identical to the dogfood's. An adopter replaces the placeholder with their own art (see `DEPLOY.md`).
+7. **Determinism.** Same inputs -> same bytes for anything generated; no wall clock in shipped surfaces.
+8. **The log is the memory.** Every agent session appends its receipts to [labs/TASKS.md](./labs/TASKS.md) and versioned changes to [CHANGELOG.md](./CHANGELOG.md) - the next agent should never have to guess what happened.
+9. **Prose flow.** Living prose never hard-wraps at commit time: paragraphs flow, and `lib/unwrap-prose.cjs` joins hard-wrapped prose without touching frontmatter, fences, indented code, tables, headings, thematic breaks, or HTML blocks. Dated history keeps its era wording.
 
 ## The /packs ecosystem (the family contract)
 

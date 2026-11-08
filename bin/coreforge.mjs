@@ -22,6 +22,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, copyFi
 import { join, dirname, relative, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
+import { validateIdentity } from '../lib/identity.mjs'
 
 const SELF = dirname(fileURLToPath(import.meta.url))
 const PKG_ROOT = resolve(SELF, '..')
@@ -55,7 +56,7 @@ census gate refuses an identity literal that lives anywhere else.
 create answers (flags or <dir>/site.json):
   { "name": "acme", "url": "https://acme.creadev.org",
     "repo": "https://github.com/acme/acme",
-    "docsHost": "docs.creadev.org", "docsBaseurl": "/acme",
+    "docsHost": "https://docs.creadev.org", "docsBaseurl": "/acme",
     "org": "https://github.com/acme", "author": "acme",
     "makerLabel": "acme", "orgName": "acme",
     "wordmarkAccent": "ac", "wordmarkRest": "me" }
@@ -152,7 +153,7 @@ function create(root) {
     console.error('  (the interactive prompt lands in a later pass; the answers file is the scriptable contract today)')
     return 1
   }
-  const host = answers.docsHost || 'docs.creadev.org'
+  const host = answers.docsHost || 'https://docs.creadev.org'
   const baseurl = answers.docsBaseurl || `/${answers.name}`
   const site = {
     name: answers.name,
@@ -167,6 +168,19 @@ function create(root) {
     orgName: answers.orgName || answers.name,
     wordmarkAccent: answers.wordmarkAccent || answers.name.slice(0, 4),
     wordmarkRest: answers.wordmarkRest || answers.name.slice(4),
+  }
+
+  // Validate the identity the answers produce BEFORE writing anything: a bad
+  // docs.host (missing scheme) would bake a scheme-less URL into the derived
+  // surfaces and only fail at docs deploy. Refuse the answers, leave no tree.
+  const identityErrors = validateIdentity({
+    url: site.url,
+    docs: { host: site.docsHost, url: site.docsUrl, baseurl: site.docsBaseurl },
+  })
+  if (identityErrors.length) {
+    console.error(`create: FAIL (the answers are not a valid identity - ${identityErrors.length} error(s)):`)
+    for (const e of identityErrors) console.error('  ' + e)
+    return 1
   }
 
   const TOKENS = [
@@ -221,6 +235,15 @@ function create(root) {
   if (residue.length) {
     console.error('create: FAIL (placeholder residue - the answer set is incomplete)')
     for (const r of residue) console.error('  ' + r)
+    return 1
+  }
+
+  // Generate the derived surfaces now, so a fresh stamp is doctor-clean rather
+  // than failing on the stale-derived check. `sync` is idempotent and derives
+  // only from site.config.js, so this is safe even when create skipped files.
+  const synced = syncTree(root, false)
+  if (synced !== 0) {
+    console.error('create: FAIL (sync of the derived surfaces failed - see above)')
     return 1
   }
   console.log('create: next - npm install, then `coreforge doctor`')
