@@ -45,6 +45,7 @@ function tempTree() {
   fs.copyFileSync(path.join(REPO, 'site.config.js'), path.join(dir, 'site.config.js'))
   fs.copyFileSync(path.join(REPO, 'lib', 'root.cjs'), path.join(dir, 'lib', 'root.cjs'))
   fs.copyFileSync(path.join(REPO, 'lib', 'root.mjs'), path.join(dir, 'lib', 'root.mjs'))
+  fs.copyFileSync(path.join(REPO, 'lib', 'identity.mjs'), path.join(dir, 'lib', 'identity.mjs'))
   fs.copyFileSync(path.join(REPO, 'lib', 'sync.mjs'), path.join(dir, 'lib', 'sync.mjs'))
   fs.copyFileSync(path.join(REPO, 'lib', 'gates', 'check-brand-census.mjs'), path.join(dir, 'lib', 'gates', 'check-brand-census.mjs'))
   fs.mkdirSync(path.join(dir, 'web', 'public'), { recursive: true })

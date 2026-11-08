@@ -100,6 +100,61 @@ test('create never clobbers an existing file', () => {
   }
 });
 
+test('create leaves a doctor-clean tree without a manual sync step', () => {
+  const dir = tmp();
+  try {
+    writeFileSync(join(dir, 'site.json'), JSON.stringify({
+      name: 'acme', url: 'https://acme.creadev.org', repo: 'https://github.com/acme/acme',
+    }));
+    const created = cli(['create', dir]);
+    assert.equal(created.status, 0, created.stderr);
+    // create derives the surfaces itself, so doctor is green on the fresh stamp
+    // with no separate `sync` - the adopter never lands a stale first commit.
+    assert.match(created.stdout, /sync: PASS/);
+    const doc = cli(['doctor', dir]);
+    assert.equal(doc.status, 0, doc.stdout + doc.stderr);
+    assert.match(doc.stdout, /doctor: 0 fail\(s\) - PASS/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('create refuses a scheme-less docsHost (the docs-link trap)', () => {
+  const dir = tmp();
+  try {
+    writeFileSync(join(dir, 'site.json'), JSON.stringify({
+      name: 'acme', url: 'https://acme.creadev.org', repo: 'https://github.com/acme/acme',
+      docsHost: 'docs.creadev.org',
+    }));
+    const res = cli(['create', dir]);
+    assert.equal(res.status, 1);
+    assert.match(res.stderr, /docs\.host must be an absolute http\(s\) origin/);
+    // The refusal lands before the stamp: no half-written tree is left behind.
+    assert.ok(!existsSync(join(dir, 'site.config.js')), 'a rejected identity must not stamp a tree');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('sync refuses a scheme-less docs.host in the committed config', () => {
+  const dir = tmp();
+  try {
+    writeFileSync(join(dir, 'site.json'), JSON.stringify({
+      name: 'acme', url: 'https://acme.creadev.org', repo: 'https://github.com/acme/acme',
+    }));
+    assert.equal(cli(['create', dir]).status, 0);
+    const cfg = join(dir, 'site.config.js');
+    const text = require('node:fs').readFileSync(cfg, 'utf8')
+      .replace(/host: 'https:\/\/docs\.creadev\.org'/, "host: 'docs.creadev.org'");
+    writeFileSync(cfg, text);
+    const res = cli(['sync', dir]);
+    assert.equal(res.status, 1);
+    assert.match(res.stderr, /docs\.host must be an absolute http\(s\) origin/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('doctor refuses a stale derived surface (generated green is never shipped)', () => {
   const dir = tmp();
   try {
@@ -107,7 +162,9 @@ test('doctor refuses a stale derived surface (generated green is never shipped)'
       name: 'acme', url: 'https://acme.creadev.org', repo: 'https://github.com/acme/acme',
     }));
     assert.equal(cli(['create', dir]).status, 0);
-    // No sync yet: the derived surfaces are absent, so doctor must FAIL.
+    // create synced the surfaces; hand-delete one to simulate the drift class
+    // the check exists to catch (a generated file edited or removed by hand).
+    rmSync(join(dir, 'docs', '_config.yml'));
     const doc = cli(['doctor', dir]);
     assert.equal(doc.status, 1);
     assert.match(doc.stdout, /derived surfaces are stale/);
