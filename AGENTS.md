@@ -14,11 +14,12 @@ lib/                    the TOOL (versioned once, imported by adopters)
   sync.mjs              fans the identity out to the non-JS surfaces
   template.mjs          builds templates/site/ from the dogfood tree
   lint-packs.cjs        the packstruct wrapper verb
-  ship-from-download.cjs the phone publish lane
   release-notes.cjs     extracts the CHANGELOG section the GH release body uses
   verify-release.cjs    the post-publish trust ladder (npm + GH release)
   unwrap-prose.cjs      flows hard-wrapped prose in living surfaces
   check-action-pins.cjs refuses a floating Action ref (pins, never floats)
+scripts/                the family-canon tools that travel by COPY, not import
+  ship-from-download.cjs the phone publish lane (Termux recipe, scripted)
 templates/site/         the copy source `coreforge create` stamps (GENERATED - npm run template):
                         web/ + docs/ + site.config.js + .gitignore + packs/ + the standalone CI
                         (docs lane, its caller, the staging fast-forward); the tool-coupled
