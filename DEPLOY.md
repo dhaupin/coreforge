@@ -76,7 +76,19 @@ When you do want the Jekyll stack locally - and an agent sandbox with no sudo an
 
 The root `.gitignore` already carries the belt-and-suspenders block (`docs/.bundle/`, `docs/vendor/`, `docs/_site/`, `docs/Gemfile.lock`) so an accidental in-tree build taints nothing.
 
-## 6. What is deliberately NOT in this runbook
+## 6. The phone ship lane
+
+`scripts/ship-from-download.cjs` stages a GitHub zip-extracted tree inside the Termux home and publishes it (the Termux recipe, scripted). It is family-reusable and product-agnostic - every sibling vendors the same bytes under its own `scripts/`:
+
+```bash
+NPM_TOKEN=<token> node scripts/ship-from-download.cjs \
+  --target /storage/emulated/0/Download/coreforge-main/coreforge-main \
+  --root ~/web/coreforge-main               [--dry-run] [--clean]
+```
+
+The repo's own `prepublishOnly` gate still rules; the ship script only gets the tree to the launchpad. Tested by `tests/ship-from-download.test.cjs`.
+
+## 7. What is deliberately NOT in this runbook
 
 - Pack publication, the pack lint lane, and SPEC receipts: packs are a family contract explained in [packs/README.md](./packs/README.md), not part of the shell's own deploy story.
 - Server work: there is none. If your project needs a backend, that is a feature of YOUR project, not of this rig.
