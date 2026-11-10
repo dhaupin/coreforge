@@ -2,13 +2,15 @@
 permalink: /
 layout: default
 title: coreforge docs
-description: The landing + docs rig the struct family ships sites from - this page proves the docs shell builds, searches, and highlights with the real brand aboard.
+description: The docs rig the struct family ships sites from - this page proves the shell builds, searches, and highlights with your brand aboard.
 nav_order: 1
 ---
 
 # coreforge docs
 
-The coreforge shell's docs head: one sample page so the frontmatter gate, the link check, and the Rouge engine all have real bytes to chew on. Replace it with your pages and keep the four required frontmatter fields (permalink, layout, title, description) on every page.
+This is the docs head of the coreforge shell: one sample page, so the frontmatter gate, the link check, and the Rouge highlighter all have real bytes to chew on. Replace it with your own pages, and keep the four required frontmatter fields (permalink, layout, title, description) on every page you add.
+
+The docs are one of the sites the shell ships. The landing, the docs, and the CI/release plumbing all read one brand file (`site.config.js`), so a rebrand is one edit, not a hunt across three languages. The [CLI](/coreforge/cli/) page covers the verbs that stamp, sync, and prove a site.
 
 ## Highlighting works out of the box
 

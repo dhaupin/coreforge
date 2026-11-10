@@ -18,16 +18,16 @@
  *
  * The docs identity (docs/_config.yml, freestruct.config.yml) and the landing
  * identity (ssr.config.js, robots, webmanifest) come from ONE block below, so
- * the two sites cannot disagree about who they are.
+ * the landing and the docs cannot disagree about who they are.
  */
 export default {
   // --- identity -----------------------------------------------------------
   name: 'coreforge',
   wordmark: { accent: 'core', rest: 'forge' },
   badge: 'beta',
-  tagline: 'One repo, two sites, zero styling drift.',
+  tagline: 'One repo, every site: one brand file, zero drift.',
   description:
-    'The shell the struct family ships sites from: landing + docs rig + CI/release plumbing, with brand as data.',
+    'The shell the struct family ships sites from: a landing rig, a docs rig, and the CI/release plumbing, all driven from one brand file.',
   url: 'https://coreforge.creadev.org',
   repo: 'https://github.com/dhaupin/coreforge',
   author: 'dhaupin',
@@ -88,7 +88,7 @@ export default {
       meta: {
         title: 'coreforge - the shell the struct family ships sites from',
         description:
-          'One repo, two sites, zero styling drift: the landing shell, the docs rig, and the CI/release plumbing the struct family keeps re-porting, with brand as data.',
+          'One repo, every site: the landing rig, the docs rig, and the CI/release plumbing the struct family keeps re-porting, all driven from one brand file.',
       },
     },
     {

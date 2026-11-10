@@ -1,6 +1,6 @@
 # AGENTS.md - working conventions for agents on this repo
 
-coreforge is the **shell** the struct family ships new sites from: the landing + docs rig and the CI/release plumbing, with the brand as data. Humans are the primary audience; this file doubles as the agent cheat sheet so nobody re-learns the same lessons from scratch. See the sibling docs: [README.md](./README.md) (product + box contents), [DEPLOY.md](./DEPLOY.md) (deploy + release runbook), [CHANGELOG.md](./CHANGELOG.md) (the release log), [MANIFEST.md](./MANIFEST.md) (per-file receipts), and [labs/TASKS.md](./labs/TASKS.md) (the rolling work log).
+coreforge is the **shell** the struct family ships new sites from: the landing rig, the docs rig, and the CI/release plumbing, with the brand as data. Humans are the primary audience; this file doubles as the agent cheat sheet so nobody re-learns the same lessons from scratch. See the sibling docs: [README.md](./README.md) (product + box contents), [DEPLOY.md](./DEPLOY.md) (deploy + release runbook), [CHANGELOG.md](./CHANGELOG.md) (the release log), [MANIFEST.md](./MANIFEST.md) (per-file receipts), and [labs/TASKS.md](./labs/TASKS.md) (the rolling work log).
 
 ## Layout
 

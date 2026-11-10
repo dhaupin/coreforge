@@ -52,7 +52,7 @@ cat > site.json <<'JSON'
   "name": "acme",
   "url": "https://acme.creadev.org",
   "repo": "https://github.com/acme/acme",
-  "docsHost": "docs.creadev.org",
+  "docsHost": "https://docs.creadev.org",
   "docsBaseurl": "/acme"
 }
 JSON
