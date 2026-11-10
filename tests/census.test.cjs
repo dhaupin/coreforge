@@ -1,6 +1,6 @@
 'use strict'
 
-// The version-truth census leg (flowforge#28, the rig rider).
+// The version-truth census leg (coreforge#28, the rig rider).
 //
 // package.json is THE single version source of a repo. Any living surface
 // that names the CURRENT version - a second side package.json, a README

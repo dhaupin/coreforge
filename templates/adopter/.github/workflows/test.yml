@@ -17,8 +17,12 @@ name: test
 #     config (your routes/adapters) and the campaign wakes on its own.
 #   poststruct - TBA. A post-build SEO check-profile host; wake it when you
 #     want your built dist/ graded, beside the pinned tool rows.
-#   eyestruct  - TBA. Visual regression needs committed baselines
-#     (labs/.eyes/); wake it once you have a stable site worth freezing.
+#   eyestruct  - WIRED-WHEN-READY. Visual regression needs committed baselines
+#     (labs/.eyes/), so the step arm-gates on the manifest's existence.
+#     `eyestruct gate` is a browserless read-only pass over labs/.eyes/ (exit 1
+#     on unexplained drift) - no chrome, no network. Seed the home once with
+#     `eyestruct init`; canon is CI-cut by eyestruct's own ratify lane (a push
+#     battery proposes, it never cuts canon).
 #   govstruct  - n/a for a plain site (registry/compliance); it governs the
 #     FAMILY roster, not an individual stamped site.
 #
@@ -81,6 +85,19 @@ jobs:
       - name: Crashtest the site
         if: ${{ hashFiles('crashtest.config.js') != '' }}
         run: node node_modules/crashtest/bin/crashtest.js run
+
+      # eyestruct: armed, but wakes only when you have committed a visual home
+      # (labs/.eyes/). `eyestruct gate` is a browserless read-only pass - it
+      # needs no chrome and no network, so it is safe to run in CI the moment a
+      # manifest exists. Canon is CI-cut (eyestruct's own ratify lane); this
+      # battery only refuses unexplained drift.
+      - name: Install eyestruct (pinned, parked until labs/.eyes lands)
+        if: ${{ hashFiles('labs/.eyes/manifest.yml') != '' }}
+        run: npm install --no-save --no-audit --no-fund eyestruct@1.1.0
+
+      - name: Eyestruct gate (visual memory)
+        if: ${{ hashFiles('labs/.eyes/manifest.yml') != '' }}
+        run: node node_modules/eyestruct/bin/eyestruct.js gate
 
       - name: Install web deps
         run: npm install --prefix web --no-audit --no-fund
