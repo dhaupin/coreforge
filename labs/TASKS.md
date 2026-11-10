@@ -495,3 +495,25 @@ SUPERSEDES the "Docs-lane topology - DECIDED: leave it alone" note above. That n
   5. **#36 - the in-repo rename half.** The living surfaces were already `coreforge`; what remained was prose + citation drift: `MANIFEST.md`'s title (`# flowforge MANIFEST`) and its living-surface rows (`flowforge create`, `flowforge-theme` -> `site-theme`, `flowforge-paint-scheme` -> `site-paint-scheme`), the `flowforge#NN` issue citations in `test.yml` / `check-birth-gate.cjs` / `lint-packs.cjs` / `adopt-icons.mjs` / `census.test.cjs` -> `coreforge#NN`, and `check-birth-gate.cjs`'s stale `scripts/` path comment. Era rows (`labs/prd-flowforge.md`, the dated `2026-10-25 flowforge round` history) keep `flowforge` by design - lawful era wording, never rewritten. The YARD half (railyard `mounts/state.json` + the `railyard_ferry`) and the govstruct roster flip are cross-repo and tracked on railyard (see the sibling-issue note below).
 
   Receipts: `npm test` 129/129 (was 126; +3 new laws), `npm run check` green (birth-gate, theme-parity, sync:check, template:check 41 files, brand-census, action pins, prestruct pins, language), `npm run lint:docs` 6/6 PASS. No version bump; v1.0.0 still held.
+
+---
+
+### 2026-11-03 - session: breadcrumbs on (engine + this site)
+
+Google Search Console showed the family's properties under a breadcrumbs enhancement with 0 results. Recon split the fleet: the docs sites run freestruct (auto BreadcrumbList since 1.1.0); the product sites run prestruct, whose `buildJsonLd()` is site-wide by contract and could never emit a per-route trail. prestruct gained engine-level `breadcrumb: true` (injectMeta already owns the route path); this repo turned the discovery surface on.
+
+- `lib/sync.mjs` renders `breadcrumb: true` into every adopter's docs config (regenerated here, sync:check PASS); `web/ssr.config.js` + `templates/site/web/ssr.config.js` - `breadcrumb: true`.
+- Receipts: docs config validates against the pinned engine; docs sync:check PASS where generated; prestruct's own `example/` build proves emission (BreadcrumbList on a sub-route, none on `/`).
+- No version bump; a discovery-surface opt-in.
+
+---
+
+### 2026-11-10 - light mode by default (web + docs)
+
+Owner directive: the family defaults to light. The product sites and docs sites shipped dark-first (a persisted `light` was the opt-in); now light is the first paint and a persisted `dark` theme is the opt-in. Shape: `<html>` pins `data-theme="light"`, the pre-paint bootstrap applies only a persisted `dark`, and the `theme-color` meta flips to the light paper. The CSS token blocks are untouched (the light block is already the second half of one set), so no palette, toggle handler, or gate changed.
+
+- `web/index.html` - `<html data-theme="light">`; two-axis bootstrap applies a persisted `dark`; `theme-color` light (`#edf3f2`); `site.config.js` `defaultMode` dark -> light.
+- `docs/_layouts/default.html` - `<html data-theme="light">`; bootstrap inverted; `color-scheme` `light dark`.
+- `lib/sync.mjs` - the PWA manifest `background_color`/`theme_color` go light; regenerated (`sync:check` PASS).
+- `templates/site/` - regenerated (`npm run template`), so a stamped site is light-first (`web/index.html`, `docs/_layouts/default.html`, `site.config.js`).
+- Receipts: `npm test` 129/129; `npm run check` green (theme-parity, template:check, brand census, docs-lint).

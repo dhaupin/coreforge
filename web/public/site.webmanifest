@@ -4,8 +4,8 @@
   "description": "The shell the struct family ships sites from: a landing rig, a docs rig, and the CI/release plumbing, all driven from one brand file.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#10131a",
-  "theme_color": "#10131a",
+  "background_color": "#edf3f2",
+  "theme_color": "#edf3f2",
   "lang": "en",
   "icons": [
     {
