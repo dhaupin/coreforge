@@ -12,9 +12,15 @@ packs/local/
 # Local docs-preview toolchain (issue #22): the Jekyll preview recipe runs
 # from a scratch copy of docs/ with Bundler's path OUTSIDE the repo, so none
 # of these should ever appear - belt-and-suspenders so an accidental in-tree
-# build taints nothing. If your repo intentionally commits a docs
-# Gemfile.lock (this rig does not - CI resolves fresh), drop that one line.
+# build taints nothing. `npm run docs` builds IN-TREE (unlike the scratch-copy
+# recipe), so the Jekyll + pagefind products it drops are ignored here too
+# (issue #48). If your repo intentionally commits a docs Gemfile.lock (this rig
+# does not - CI resolves fresh), drop that one line.
 docs/.bundle/
 docs/vendor/
 docs/_site/
+docs/.jekyll-cache/
+docs/.jekyll-metadata
+docs/pagefind/
+docs/pagefind*
 docs/Gemfile.lock
