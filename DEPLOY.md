@@ -64,6 +64,24 @@ Docs builds are CI's job locally-optional (Jekyll is too much runtime to demand)
 
 ### Local docs preview without tainting the tree (issue #22)
 
+**First, try the one-liner (issue #47).** The common case is a ruby that already exists (system or user) in a no-sudo sandbox, where `bundle install` dies:
+
+```
+Bundler::PermissionError: There was an error while trying to write to
+`/var/lib/gems/<ver>/cache`.
+```
+
+Bundler defaulted its path to the SYSTEM gem dir even though a user gem dir is what is on `PATH`. No root needed - pin Bundler local to the repo:
+
+```bash
+cd docs
+bundle config set --local path 'vendor/bundle'   # writes docs/.bundle/config
+bundle install                                    # resolves into ./vendor/bundle, never the system dir
+bundle exec jekyll build
+```
+
+`docs/vendor/` and `docs/.bundle/` are already gitignored, so this taints nothing. Reach for the full unpacked-ruby recipe below only when there is NO ruby on the box at all.
+
 When you do want the Jekyll stack locally - and an agent sandbox with no sudo and no system Ruby will - run it out-of-tree so nothing lands in the repo (worked example: dhaupin/eyestruct@8a194ad, gitignore block ca2f62a). The shape, no root anywhere:
 
 1. Unpack a prebuilt, platform-matched Ruby from the official ruby/ruby-builder releases into `$HOME` (e.g. `~/rubies`), never the repo. The release tag is the VERSION (`ruby-<ver>`, asset `ruby-<ver>-<os>-x64.tar.gz`); a `toolcache` tag 404s.
@@ -74,7 +92,7 @@ When you do want the Jekyll stack locally - and an agent sandbox with no sudo an
 6. Build from a scratch COPY of `docs/` (e.g. `/tmp/docs-preview`) - jekyll writes `_site` beside the source, so the copy carries every build product away from the tree.
 7. Serve `_site` under the real baseurl (symlink `<webroot>/<baseurl>` to `_site`, then `python3 -m http.server`) so baseurl'd links resolve.
 
-The root `.gitignore` already carries the belt-and-suspenders block (`docs/.bundle/`, `docs/vendor/`, `docs/_site/`, `docs/Gemfile.lock`) so an accidental in-tree build taints nothing.
+The root `.gitignore` already carries the belt-and-suspenders block (`docs/.bundle/`, `docs/vendor/`, `docs/_site/`, `docs/.jekyll-cache/`, `docs/.jekyll-metadata`, `docs/pagefind*`, `docs/Gemfile.lock`) so an accidental in-tree build taints nothing - including the products `npm run docs` drops beside the source.
 
 ## 6. The phone ship lane
 

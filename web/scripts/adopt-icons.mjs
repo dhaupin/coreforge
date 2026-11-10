@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * web/scripts/adopt-icons.mjs - the icon pipeline (flowforge#17): brand art
+ * web/scripts/adopt-icons.mjs - the icon pipeline (coreforge#17): brand art
  * -> traced vector -> full icon set -> an authored brand-mark.json the OG
  * card can redraw. One command regenerates the whole set from a raster logo,
  * so every repo in the family gets the same one-command rebrand.

@@ -18,9 +18,12 @@ name: test
 #     a published packstruct check-profile CLI or the first check-profile
 #     pack in packs/public/ - put its install + run beside the pin rows in
 #     MANIFEST.md (pin moves = MANIFEST row in the SAME commit).
-#   eyestruct  - TBA. Not a product yet (README-only repo). No CLI to pin.
-#     Same wake-condition rule as poststruct; anything wired before a CLI
-#     exists would be theater, and the battery never ships theater.
+#   eyestruct  - WIRED-WHEN-READY. Eyestruct 1.0.0+ ships a CLI and a stable
+#     `eyestruct gate` (browserless, read-only over labs/.eyes/), so the slot is
+#     no longer theater to wire. The step arm-gates on labs/.eyes/manifest.yml
+#     existing: the shell has no visual home yet, so it stays parked instead of
+#     fake-red (the same posture as crashtest). Seed labs/.eyes/ with
+#     `eyestruct init` and the gate wakes on its own.
 
 on:
   push:
@@ -47,15 +50,15 @@ jobs:
       - name: Install (root, hermetic)
         run: npm ci --no-fund --no-audit
 
-      # The node:test spine: the version-truth census (flowforge#28) and the
-      # ship-from-download lane behavior tests (flowforge#24). Same legs the
+      # The node:test spine: the version-truth census (coreforge#28) and the
+      # ship-from-download lane behavior tests (coreforge#24). Same legs the
       # prepublishOnly gate runs, so a release cannot outrun its tests.
       - name: Node test spine
         run: npm test
 
       # The five lib/gates gates compile then run (frontmatter, links, style,
       # fiction signatures, Liquid filters) plus the birth-gate lane
-      # (flowforge#5: YAML-parse every workflow, mount independence, gc-safe
+      # (coreforge#5: YAML-parse every workflow, mount independence, gc-safe
       # serde, determinism note). Same ritual as the README.
       - name: Shell gates
         run: npm run check && npm run lint:docs
@@ -113,3 +116,16 @@ jobs:
       - name: Crashtest the shell
         if: ${{ hashFiles('crashtest.config.js') != '' }}
         run: node node_modules/crashtest/bin/crashtest.js run
+
+      # eyestruct row: armed, but wakes only when the shell has a visual home
+      # (labs/.eyes/). `eyestruct gate` is browserless + read-only (exit 1 on
+      # unexplained drift), so it needs no chrome. PINNED to npm 1.1.0; a bump
+      # moves the MANIFEST.md row in the same commit. Remove the `if:` lines
+      # the day labs/.eyes/ lands (issue #35).
+      - name: Install eyestruct (pinned, parked until labs/.eyes lands)
+        if: ${{ hashFiles('labs/.eyes/manifest.yml') != '' }}
+        run: npm install --no-save --no-audit --no-fund eyestruct@1.1.0
+
+      - name: Eyestruct gate (visual memory)
+        if: ${{ hashFiles('labs/.eyes/manifest.yml') != '' }}
+        run: node node_modules/eyestruct/bin/eyestruct.js gate

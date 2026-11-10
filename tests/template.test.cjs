@@ -86,6 +86,44 @@ test('the template ships a .gitignore', () => {
   assert.ok(fs.existsSync(path.join(OUT, '.gitignore')), 'templates/site/.gitignore must exist')
 })
 
+test('the template .gitignore ignores the in-tree Jekyll + pagefind products (issue #48)', () => {
+  // `npm run docs` builds IN-TREE, so Jekyll + pagefind drop products beside
+  // the source. The template must ignore them or every adopter rediscovers the
+  // untracked-noise trap (gamestruct had to add these by hand).
+  const text = fs.readFileSync(path.join(OUT, '.gitignore'), 'utf8')
+  for (const line of ['docs/.jekyll-cache/', 'docs/.jekyll-metadata', 'docs/pagefind/', 'docs/pagefind*']) {
+    assert.ok(text.includes(line), `templates/site/.gitignore must ignore ${line}`)
+  }
+  // And the dogfood's own .gitignore must carry them too (same law, both trees).
+  const root = fs.readFileSync(path.join(ROOT, '.gitignore'), 'utf8')
+  for (const line of ['docs/.jekyll-cache/', 'docs/.jekyll-metadata', 'docs/pagefind/']) {
+    assert.ok(root.includes(line), `the root .gitignore must ignore ${line}`)
+  }
+})
+
+test('the stamped docs caller triggers on site.config.js, not the dogfood sync path (issue #49)', () => {
+  // An identity-only edit to site.config.js is a real docs change (the docs
+  // identity is derived from it), so the caller's `paths` must list it. The
+  // dogfood's sync entrypoint (lib/sync.mjs) is NOT an adopter file - an
+  // adopter syncs with the `coreforge sync` CLI - so it must not leak in.
+  const caller = fs.readFileSync(path.join(OUT, '.github', 'workflows', 'docs-deploy.yml'), 'utf8')
+  assert.match(caller, /paths: \[[^\]]*'site\.config\.js'/, 'the stamped caller must trigger on site.config.js')
+  assert.doesNotMatch(caller, /lib\/sync\.mjs/, 'the dogfood sync path must not ship in the stamped caller')
+})
+
+test('the stamped battery carries the arm-gated eyestruct leg (issue #35)', () => {
+  // eyestruct 1.0.0+ ships `eyestruct gate` (browserless, read-only), so the
+  // slot is wired - arm-gated on labs/.eyes/manifest.yml so an unseeded site
+  // stays parked instead of fake-red. The dogfood battery carries the same row.
+  const adopter = fs.readFileSync(path.join(ROOT, 'templates', 'adopter', '.github', 'workflows', 'test.yml'), 'utf8')
+  assert.match(adopter, /eyestruct@1\.1\.0/, 'the adopter battery must pin eyestruct exactly')
+  assert.match(adopter, /hashFiles\('labs\/\.eyes\/manifest\.yml'\)/, 'the eyestruct leg must arm-gate on the manifest')
+  assert.match(adopter, /eyestruct\.js gate/, 'the adopter battery must run the eyestruct gate')
+  const own = fs.readFileSync(path.join(ROOT, '.github', 'workflows', 'test.yml'), 'utf8')
+  assert.match(own, /eyestruct@1\.1\.0/, 'the dogfood battery must carry the eyestruct row too')
+  assert.match(own, /hashFiles\('labs\/\.eyes\/manifest\.yml'\)/, 'the dogfood eyestruct row must arm-gate on the manifest')
+})
+
 test('the template ships NEUTRAL placeholder art, never the shell\'s own brand', () => {
   // The leak: binary art cannot be tokenized, so a plain copy shipped
   // coreforge's mark (and its brand/logo.jpg master) into every stamped site.
