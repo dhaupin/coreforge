@@ -1,6 +1,6 @@
 # DEPLOY.md - the deploy + release runbook
 
-The setup: **two static sites** (a landing shell, a docs rig) plus an optional npm package, all deployable with the workflows this rig ships. The box contents live in [README.md](./README.md); agent conventions live in [AGENTS.md](./AGENTS.md); version bumps are logged in [CHANGELOG.md](./CHANGELOG.md). Nothing here needs a database, a key, or a server - the rig's shell is static all the way out.
+The setup: **static sites** (a landing shell, a docs rig, and room for more) plus an optional npm package, all deployable with the workflows this rig ships. The box contents live in [README.md](./README.md); agent conventions live in [AGENTS.md](./AGENTS.md); version bumps are logged in [CHANGELOG.md](./CHANGELOG.md). Nothing here needs a database, a key, or a server - the rig's shell is static all the way out.
 
 ## 1. The landing (`web/`, prestruct)
 

@@ -4,7 +4,7 @@
 title: coreforge
 baseurl: /coreforge # the docs deploy path (GitHub Pages project path)
 url: https://docs.creadev.org
-description: "The shell the struct family ships sites from: landing + docs rig + CI/release plumbing, with brand as data."
+description: "The shell the struct family ships sites from: a landing rig, a docs rig, and the CI/release plumbing, all driven from one brand file."
 
 # Identity the layout renders (docs/_layouts/default.html reads these; the
 # brand census gate keeps the layout from hardcoding any of them).
