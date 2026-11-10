@@ -17,13 +17,15 @@ export default function Home() {
       <div className="wrap">
         <p className="eyebrow">{site.name} shell</p>
         <h1>
-          One repo, two sites, <span className="accent">zero styling drift.</span>
+          One repo, every site:{' '}
+          <span className="accent">one brand file, zero drift.</span>
         </h1>
         <p className="lede">
-          This is the coreforge rig: landing + docs + CI/release plumbing, with your
-          brand as data. Replace the tokens, the nav vocabulary, and the copy - the
-          shell carries the paid-for correctness (prerender, hydration parity,
-          light/dark switch, search, pagefind, deploy workflows).
+          This is the coreforge rig: a landing site, a docs site, and the CI/release
+          plumbing that keeps them honest, all driven from one brand file. Edit that one
+          file and every surface follows - replace the tokens, the nav vocabulary, and the
+          copy, and the shell carries the paid-for correctness (prerender, hydration
+          parity, light/dark switch, search, pagefind, deploy workflows).
         </p>
         <div className="cta-row">
           <a className="btn btn-primary" href={site.repo}>See the repo</a>
