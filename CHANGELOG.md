@@ -6,6 +6,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), [SemVer](https
 
 ## [Unreleased] - staging (2026-10-29)
 
+### 2026-11-03 - breadcrumbs on (engine + this site)
+
+Google Search Console showed the family's properties under a breadcrumbs enhancement with 0 results. Recon split the fleet: the docs sites run freestruct (auto BreadcrumbList since 1.1.0); the product sites run prestruct, whose `buildJsonLd()` is site-wide by contract and could never emit a per-route trail. prestruct gained engine-level `breadcrumb: true` (injectMeta owns the route path), and this repo turned the discovery surface on in its configs.
+
+- `lib/sync.mjs` renders `breadcrumb: true` into every adopter's `docs/freestruct.config.yml`; regenerated here, sync:check PASS.
+- `web/ssr.config.js` + `templates/site/web/ssr.config.js` - `breadcrumb: true`, so every stamped site inherits it.
+- Receipts: docs config validates against the pinned engine; docs sync:check PASS where generated.
+- No version bump; a discovery-surface opt-in.
+
+
 ### Changed
 
 - **The eyestruct arm is wired into the stamped lanes (issue #35).** Eyestruct 1.0.0 froze the contract and ships `eyestruct gate` (browserless, read-only over `labs/.eyes/`, exit 1 on unexplained drift), so the one family arm the rig did not compose is no longer theater to wire. The dogfood battery (`test.yml`) and the stamped adopter battery (`templates/adopter/.github/workflows/test.yml`) now carry an ARM-GATED row (pinned `eyestruct@1.1.0`, gated on `labs/.eyes/manifest.yml` existing) that runs the gate - an unseeded site stays parked instead of fake-red. Canon stays CI-cut (eyestruct's own ratify lane); the push battery only refuses drift. `MANIFEST.md` gains the engine-pin row. Fixture: `tests/template.test.cjs`.

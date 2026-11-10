@@ -495,3 +495,13 @@ SUPERSEDES the "Docs-lane topology - DECIDED: leave it alone" note above. That n
   5. **#36 - the in-repo rename half.** The living surfaces were already `coreforge`; what remained was prose + citation drift: `MANIFEST.md`'s title (`# flowforge MANIFEST`) and its living-surface rows (`flowforge create`, `flowforge-theme` -> `site-theme`, `flowforge-paint-scheme` -> `site-paint-scheme`), the `flowforge#NN` issue citations in `test.yml` / `check-birth-gate.cjs` / `lint-packs.cjs` / `adopt-icons.mjs` / `census.test.cjs` -> `coreforge#NN`, and `check-birth-gate.cjs`'s stale `scripts/` path comment. Era rows (`labs/prd-flowforge.md`, the dated `2026-10-25 flowforge round` history) keep `flowforge` by design - lawful era wording, never rewritten. The YARD half (railyard `mounts/state.json` + the `railyard_ferry`) and the govstruct roster flip are cross-repo and tracked on railyard (see the sibling-issue note below).
 
   Receipts: `npm test` 129/129 (was 126; +3 new laws), `npm run check` green (birth-gate, theme-parity, sync:check, template:check 41 files, brand-census, action pins, prestruct pins, language), `npm run lint:docs` 6/6 PASS. No version bump; v1.0.0 still held.
+
+---
+
+### 2026-11-03 - session: breadcrumbs on (engine + this site)
+
+Google Search Console showed the family's properties under a breadcrumbs enhancement with 0 results. Recon split the fleet: the docs sites run freestruct (auto BreadcrumbList since 1.1.0); the product sites run prestruct, whose `buildJsonLd()` is site-wide by contract and could never emit a per-route trail. prestruct gained engine-level `breadcrumb: true` (injectMeta already owns the route path); this repo turned the discovery surface on.
+
+- `lib/sync.mjs` renders `breadcrumb: true` into every adopter's docs config (regenerated here, sync:check PASS); `web/ssr.config.js` + `templates/site/web/ssr.config.js` - `breadcrumb: true`.
+- Receipts: docs config validates against the pinned engine; docs sync:check PASS where generated; prestruct's own `example/` build proves emission (BreadcrumbList on a sub-route, none on `/`).
+- No version bump; a discovery-surface opt-in.
