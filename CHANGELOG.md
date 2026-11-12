@@ -6,6 +6,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), [SemVer](https
 
 ## [Unreleased] - staging (2026-10-29)
 
+### 2026-11-12 - the package metadata the release forgot (repository/homepage/bugs)
+
+The family release-readiness pass checked every package's publish metadata against the family shape. coreforge was the one package published without `repository`, `homepage`, and `bugs` in `package.json` - the three fields every sibling (prestruct, memstruct, monoforge, ...) carries, and the ones npm surfaces on the package page (repo link, homepage link, issue tracker link). Added, matching the sibling shape: `repository` = `git+https://github.com/dhaupin/coreforge.git` (+ `directory` is unset - the package IS the repo root), `homepage` = `https://github.com/dhaupin/coreforge#readme`, `bugs` = `https://github.com/dhaupin/coreforge/issues` - byte-for-byte the sibling shape (verified against monoforge/prestruct). JSON valid; `npm run check` green. No version bump (0.9.0). The same pass fixed two railyard ledger drifts (coreforge's own row read `held` though it is live, and `gamestruct` was absent); the full receipt is in the parent (`dhaupin/railyard`, `CHANGELOG.md` + `labs/TASKS.md`).
+
 ### 2026-11-11 - the mobile nav fits the viewport
 
 Owner report (mobile-first): the header overflowed the phone screen and the burger - the only menu control below 640px - sat off-screen. Measured at 390px (headless probe): `document.scrollWidth` 431 vs `clientWidth` 375, the burger at x=397..431. The right cluster (GitHub icon + paint-scheme select + theme switch + burger) needs ~200px against ~144px free after the wordmark, so the row could not shrink.

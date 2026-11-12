@@ -527,3 +527,12 @@ Owner report (mobile-first): the header overflowed the phone screen and the burg
 - **Fix (`web/src/styles.css`, the 640px block).** The decorative badge hides, the gaps tighten (`.nav-inner` 22->8px, `.nav-right` 8->4px), and the wordmark may shrink (`.brand { min-width: 0; overflow: hidden; white-space: nowrap }`). Every control is kept; the row can always fit, so the burger is always reachable.
 - **Receipts.** Rebuilt dist probed at 320/360/375/390/414px - no overflow at any width, burger on-screen, all controls present. `npm run check` green.
 - **Fleet.** The same defect + fix landed in all 9 sites carrying the family shell (coreforge, crashtest, govstruct, monoforge, poststruct, eyestruct, packstruct, memstruct, gamestruct); coreforge's `templates/site/` carries the same block, so a stamped repo inherits it.
+
+### 2026-11-12 - session: the release-readiness pass reaches the forge (publish metadata + stale bugs)
+
+Owner-driven family release-readiness pass (bug/gap/edge/vuln). coreforge was swept alongside the ten siblings; the parent receipt lives in `dhaupin/railyard` (`CHANGELOG.md` + `labs/TASKS.md`).
+
+- **Publish metadata gap (fixed).** `package.json` was published without `repository`, `homepage`, and `bugs` - the three fields every sibling carries. Added byte-for-byte the sibling shape (`repository` = `git+https://github.com/dhaupin/coreforge.git`; `homepage` = `https://github.com/dhaupin/coreforge#readme`; `bugs` = `https://github.com/dhaupin/coreforge/issues`, verified against monoforge/prestruct). JSON valid; `npm run check` green.
+- **Issues #47/#48/#49 are already fixed in-tree (stale, not closed).** The three open `[bug]` issues were resolved by PR #54 (the adopter sweep, `fix: the adopter sweep - #47/#48/#49/#35/#36`) and recorded in `CHANGELOG.md`: #49 (docs-deploy `paths` names `site.config.js`; verified `templates/site/.github/workflows/docs-deploy.yml` line 34 + the dogfood caller), #48 (the template + root `.gitignore` carry `docs/.jekyll-cache/`, `docs/.jekyll-metadata`, `docs/pagefind/`, `docs/pagefind*`; verified both), #47 (DEPLOY.md §5 leads with `bundle config set --local path 'vendor/bundle'`; verified lines 78-79). Verified against the current tree - the issues should be closed with the PR #54 receipts.
+- **Vuln/edge (clean).** `npm audit --omit=dev` = 0 vulnerabilities; `npm pack --dry-run` builds (150 files); actions 40-hex pinned (`lib/check-action-pins.cjs`); `npm test` exit=0.
+- **No version bump** (0.9.0). **Hard constraint held.**
