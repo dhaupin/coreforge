@@ -2,7 +2,7 @@
 
 One repo, every site: one brand file, zero drift. This is the **rig** half of a site: the landing rig, the docs rig, and the CI/release plumbing that the struct family (dhaupin/crashtest, dhaupin/packstruct, ...) keeps rebuilding and re-porting. Every elapsed bug got paid for once, here; new adopters inherit it.
 
-Status: **0.9.0, scaffold cut.** The shell ships the landing and the docs rig plus the CI/release plumbing; the version below is held equal to `package.json` by the version-truth census leg (`npm test`), so a release moves `package.json`, `web/package.json`, and this line together.
+Status: **1.0.0, the first stable cut.** The shell ships the landing and the docs rig plus the CI/release plumbing; the version below is held equal to `package.json` by the version-truth census leg (`npm test`), so a release moves `package.json`, `web/package.json`, and this line together.
 
 ## What is in the box
 

@@ -4,7 +4,17 @@ All notable changes to the flowforge shell. The released version lives in `packa
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), [SemVer](https://semver.org/). `packs/<name>/pack.json` manifests carry THEIR OWN semver, independent of the CLI/shell - see [packs/README.md](./packs/README.md).
 
-## [Unreleased] - staging (2026-10-29)
+## [Unreleased]
+
+## [1.0.0] - 2026-11-12
+
+### 2026-11-12 - the Dependabot flow lands (railyard#31)
+
+`.github/dependabot.yml` now carries the family flow: a weekly (Monday) pass, grouped minor/patch updates in one pull request, majors alone, and the `github-actions` ecosystem so the SHA-pinned refs move without a hand-edit. npm directories `/`, `/web`. The config header names the family caveat - a tool whose output is committed as canon can have a "minor" release that changes the canon (the eyestruct 1.1.0 overlay case), so a bump arrives as a pull request that runs CI. The shape is proved and guarded on the parent (`dhaupin/creadev` PR #38; `dhaupin/railyard#31`). No version bump.
+
+### 2026-11-12 - the package metadata the release forgot (repository/homepage/bugs)
+
+The family release-readiness pass checked every package's publish metadata against the family shape. coreforge was the one package published without `repository`, `homepage`, and `bugs` in `package.json` - the three fields every sibling (prestruct, memstruct, monoforge, ...) carries, and the ones npm surfaces on the package page (repo link, homepage link, issue tracker link). Added, matching the sibling shape: `repository` = `git+https://github.com/dhaupin/coreforge.git` (+ `directory` is unset - the package IS the repo root), `homepage` = `https://github.com/dhaupin/coreforge#readme`, `bugs` = `https://github.com/dhaupin/coreforge/issues` - byte-for-byte the sibling shape (verified against monoforge/prestruct). JSON valid; `npm run check` green. No version bump (0.9.0). The same pass fixed two railyard ledger drifts (coreforge's own row read `held` though it is live, and `gamestruct` was absent); the full receipt is in the parent (`dhaupin/railyard`, `CHANGELOG.md` + `labs/TASKS.md`).
 
 ### 2026-11-11 - the mobile nav fits the viewport
 

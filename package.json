@@ -1,6 +1,6 @@
 {
   "name": "coreforge",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "type": "module",
   "description": "coreforge - the shell the struct family ships sites from: a landing rig, a docs rig, and the CI/release plumbing, all driven from one brand file. Extracted with receipts from the deployed crashtest web/docs engine.",
   "files": [
@@ -49,6 +49,14 @@
   ],
   "author": "dhaupin",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dhaupin/coreforge.git"
+  },
+  "homepage": "https://github.com/dhaupin/coreforge#readme",
+  "bugs": {
+    "url": "https://github.com/dhaupin/coreforge/issues"
+  },
   "engines": {
     "node": ">=18"
   },
