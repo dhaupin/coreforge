@@ -1,7 +1,7 @@
 {
   "name": "__NAME__-site",
   "private": true,
-  "version": "0.9.0",
+  "version": "1.0.0",
   "type": "module",
   "description": "__NAME__ site - the shell the struct family ships from (prestruct prerender + static hosting)",
   "scripts": {
