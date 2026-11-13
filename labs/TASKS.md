@@ -543,3 +543,12 @@ Owner-driven family release-readiness pass (bug/gap/edge/vuln). coreforge was sw
 - **Shape (receipt).** `dhaupin/creadev` PR #38 (`fca49c6`); the family-wide rollout is tracked on `dhaupin/railyard#31`.
 - **Guard.** railyard's `scripts/check-dependabot.cjs` (the shape) + `scripts/check-dependabot.test.cjs` (it bites), wired into railyard CI.
 - **No version bump.**
+
+### 2026-11-12 - session: the v1.0.0 cut
+
+The family release-readiness pass (owner-driven). This repo's first stable cut:
+
+- **Version.** `0.9.0 -> 1.0.0` (package.json + web/package.json + the README Status line - all held by the version-truth census leg). The shell's identity phase is the story: one `site.config.js`, the `sync` verb that fans it out, and the brand census that proves no literal hid.
+- **Changelog.** `## [Unreleased] - staging (2026-10-29)` cut to `## [1.0.0] - 2026-11-12`; entries stay verbatim.
+- **Announcement.** `docs/discussions/announcing-v1.0.0.md` + the first index row.
+- **Release.** Branch -> PR -> `staging` -> PR -> `main`, then the `v1.0.0` tag drives the OIDC ladder.

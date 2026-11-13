@@ -4,7 +4,9 @@ All notable changes to the flowforge shell. The released version lives in `packa
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), [SemVer](https://semver.org/). `packs/<name>/pack.json` manifests carry THEIR OWN semver, independent of the CLI/shell - see [packs/README.md](./packs/README.md).
 
-## [Unreleased] - staging (2026-10-29)
+## [Unreleased]
+
+## [1.0.0] - 2026-11-12
 
 ### 2026-11-12 - the Dependabot flow lands (railyard#31)
 
