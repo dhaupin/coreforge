@@ -6,6 +6,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), [SemVer](https
 
 ## [Unreleased]
 
+### 2026-11-14 - the landing page becomes a real pitch (and the npm token stops borrowing the baseurl)
+
+The landing was a hero-only placeholder - "replace the copy" was literal, and nothing on the site said who the shell is for or why a family would adopt it. It is now a full marketing lander: hero, thesis band, four audience cards, a why-it-is-needed table, the five CLI verbs, a four-step on-ramp, six adoption reasons, and an ecosystem band - the same shape the family's richer landers carry (gamestruct's, transcribed). The dogfood keeps this copy; the template keeps its NEUTRAL placeholder, exactly as the brand art does.
+
+- **The lander.** `web/src/pages/Home.jsx` sells one repo / every site / one brand file / zero drift to four readers (a first-site team, a many-repo maintainer, a solo dev, an agent). Every claim points at a receipt: the CLI page, the docs rig, MANIFEST. Identity rides `site.*`, so the copy carries no literal the census or the token pass would choke on.
+- **The design system grew the lander's classes.** `web/src/styles.css` gains `.section-title`, `.chips`/`.chip`, `.band`/`.band-thesis`/`.band-cta`, and the inline-code chip - the same additions gamestruct already carried (a clean additive delta, transcribed, not invented).
+- **The landing is now a hand-kept template placeholder.** `lib/template.mjs` adds `web/src/pages/Home.jsx` to `HANDKEPT`: the dogfood's landing is coreforge's own marketing, which the token pass cannot strip, so shipping it would hand every adopter a site that sells coreforge. The template keeps the neutral placeholder landing (the adopter replaces it, as the shell's docs say). The separation guard is generalized from art-only to any hand-kept placeholder, and the biting fixture now covers the landing too.
+- **The npm URL no longer borrows the docs baseurl.** The parity pass tokenized `site.npm` through the name/baseurl tokens, so the template carried `https://www.npmjs.com/package__DOCS_BASEURL__` - coupling the published package name to the docs baseurl (it only worked for the dogfood because both are `/coreforge`). A dedicated `__NPM_URL__` token (emitted first) and an `npm` answer (flags + `site.json`, defaulting to the package name) decouple them. `tests/cli.test.cjs` proves an adopter whose baseurl differs from the package name stamps the right URL, and the fixture bites when the token is removed.
+- **Receipts.** `npm test` 137/137, `npm run check` green (brand census, sync:check, template:check, action pins, prestruct pins, language), `npm run lint:docs` green, web build 3/3 prerender with a clean SEO audit.
+
 ### 2026-11-14 - the npm package link joins every surface (parity pass)
 
 The package was on npm but the shell's own docs never said so. The npm URL is now authored ONCE in `site.config.js` (`npm`), fanned into the generated docs config (`docs/_config.yml` `npm_url`) by `npm run sync`, and rendered by the docs footer; the landing nav carries the entry from the same identity file. A new `tests/npm-parity.test.cjs` proves the chain end to end against `package.json`, so a rename or a dropped surface reds instead of shipping a package nobody can find. No version bump.

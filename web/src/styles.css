@@ -254,6 +254,53 @@ html[data-theme="light"] .theme-switch .icon-moon { display: block; }
 .section h2 { font-size: 22px; margin: 0 0 6px; }
 .section .sub { color: var(--ink-soft); margin: 0 0 20px; font-size: 14px; }
 
+/* Section heading with a small accent rule above it (the lander's rhythm). */
+.section-title { position: relative; padding-top: 16px; }
+.section-title::before {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 40px; height: 3px; border-radius: 2px; background: var(--accent);
+}
+
+/* --- hero eyebrow separators + capability chips --- */
+.dot { color: var(--line); margin: 0 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.chip {
+  font-size: 12px; letter-spacing: 0.02em; color: var(--ink-soft);
+  border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px;
+  background: var(--surface);
+}
+.chip::before { content: '◆'; color: var(--accent); font-size: 8px; margin-right: 6px; vertical-align: middle; }
+
+/* --- full-bleed bands (the thesis line + the final CTA) --- */
+.band {
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  background: var(--surface); padding: 44px 0; margin: 24px 0;
+}
+.band-kicker {
+  font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent); margin: 0 0 12px; font-weight: 600;
+}
+.band-line {
+  font-size: clamp(18px, 2.6vw, 24px); line-height: 1.5; font-weight: 600;
+  color: var(--ink); max-width: 820px; margin: 0;
+}
+/* The thesis band: a full-bleed pull-quote. The two load-bearing phrases
+   carry the accent, the rest stays ink - so the line reads as one designed
+   statement instead of a flat paragraph. (Only .hero .accent had a rule;
+   the band's spans were falling back to plain ink, which is why the whole
+   block read as an unstyled wall of bold text.) Two geometry rules keep the
+   accent rule on the content grid: the band carries the .wrap gutter on both
+   sides (.wrap is content-box, so on narrow screens its left border otherwise
+   landed flush at x=0 and the block read as a full-bleed bar), and the wrap's
+   3px border + 17px pad = the 20px gutter every section uses, so the band
+   box is the same width as its siblings (a 24px pad made it 7px wider). */
+.band.thesis { padding-left: 20px; padding-right: 20px; }
+.band.thesis .wrap { border-left: 3px solid var(--accent); padding-left: 17px; }
+.band-line .accent { color: var(--accent); }
+.band-cta { text-align: left; padding: 56px 0; }
+.band-cta h2 { font-size: clamp(22px, 3.4vw, 32px); margin: 0 0 8px; font-weight: 800; letter-spacing: -0.01em; }
+.band-cta .sub { color: var(--ink-soft); font-size: 16px; margin: 0 0 22px; max-width: 640px; }
+
 .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
 .card {
   background: var(--surface);
@@ -264,6 +311,14 @@ html[data-theme="light"] .theme-switch .icon-moon { display: block; }
 .card h3 { margin: 0 0 8px; font-size: 15px; }
 .card h3 .glyph { color: var(--accent); margin-right: 6px; }
 .card p { margin: 0; color: var(--ink-soft); font-size: 13.5px; }
+
+/* Inline code inside a card/sub: a token-colored chip on the code-bg. */
+.card code, .section .sub code, .lede code, .band code {
+  font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 12.5px; color: var(--ink);
+  background: var(--code-bg); border: 1px solid var(--line);
+  border-radius: 4px; padding: 1px 5px;
+}
 
 /* --- pipeline --- */
 .pipeline { display: grid; gap: 10px; }

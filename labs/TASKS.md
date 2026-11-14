@@ -582,3 +582,15 @@ Every family project publishes to npm; the project's own surfaces did not always
 - **Proof.** `tests/npm-parity.test.cjs` proves the url matches `package.json`, that sync fans it into the docs config, that the footer renders it, and that the landing nav carries it. Proven to bite (removing the footer line reds the test).
 - **Template.** `npm run sync` + `npm run template` regenerated; `check` green, battery 135/135.
 - **No version bump** (the repo's own surfaces, not the shipped package's behavior).
+
+---
+
+### 2026-11-14 (cont.) - session: the coreforge real lander (+ the npm token fix)
+
+Owner directive: coreforge's landing was a placeholder; build the real lander (what it does, why it is useful, who needs it, what it works with). Done, plus a latent bug the work surfaced.
+
+- **The lander.** `web/src/pages/Home.jsx` is now a full pitch (hero + thesis band + four audience cards + a why-it-is-needed table + the five CLI verbs + a four-step on-ramp + six adoption reasons + an ecosystem band). Shape transcribed from gamestruct's lander; copy is coreforge's own, every claim pointing at a receipt. `web/src/styles.css` gained the lander classes (`.section-title`, `.chips`, `.band*`, the inline-code chip) - the same additive delta gamestruct carries.
+- **The landing is a hand-kept template placeholder now.** `lib/template.mjs` adds `web/src/pages/Home.jsx` to `HANDKEPT` (the brand-art pattern): the dogfood's landing is coreforge's marketing, which the token pass cannot strip, so the template keeps the NEUTRAL placeholder instead. The separation guard is generalized; the biting fixture covers the landing.
+- **Latent bug found + fixed.** The parity pass tokenized `site.npm` into `package__DOCS_BASEURL__`, coupling the published package name to the docs baseurl (invisible because both are `/coreforge` in the dogfood). A `__NPM_URL__` token + an `npm` answer decouple them; `tests/cli.test.cjs` proves it and bites when reverted.
+- **Receipts.** 137/137 tests, `check` green (census, sync, template, pins, language), `lint:docs` green, web build 3/3 prerender, audit clean. The lander was rendered and read back in a browser to confirm every section.
+- **Still owed.** Push the branch + open the PR (holding for the owner's go-ahead).

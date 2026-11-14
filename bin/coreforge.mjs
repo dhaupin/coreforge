@@ -127,6 +127,7 @@ function readAnswers(root) {
     else if (a === '--repo') flags.repo = rest[++i]
     else if (a === '--org') flags.org = rest[++i]
     else if (a === '--author') flags.author = rest[++i]
+    else if (a === '--npm') flags.npm = rest[++i]
   }
   const answersFile = join(root, 'site.json')
   if (existsSync(answersFile)) return { ...JSON.parse(readFileSync(answersFile, 'utf8')), ...flags }
@@ -168,6 +169,7 @@ function create(root) {
     orgName: answers.orgName || answers.name,
     wordmarkAccent: answers.wordmarkAccent || answers.name.slice(0, 4),
     wordmarkRest: answers.wordmarkRest || answers.name.slice(4),
+    npm: answers.npm || `https://www.npmjs.com/package/${answers.name}`,
   }
 
   // Validate the identity the answers produce BEFORE writing anything: a bad
@@ -184,6 +186,7 @@ function create(root) {
   }
 
   const TOKENS = [
+    ['__NPM_URL__', site.npm],
     ['__DOCS_URL__', site.docsUrl],
     ['__SITE_URL__', site.url],
     ['__REPO_URL__', site.repo],
