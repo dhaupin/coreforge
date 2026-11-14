@@ -570,3 +570,15 @@ Unblocked by prestruct 1.5.0 (it widened its peer ceilings `react`/`react-dom` `
 ### 2026-11-13 (cont.) - the release post was invisible to the sitemap (permalink shape)
 
 `docs/discussions/announcing-v1.0.0.md` carried a dotted, slashless permalink; Jekyll emits the page extensionless (Ruby reads the `.0` as a file extension) and freestruct's `.html`/`.htm` scanner never sees it - no sitemap `<loc>`, no og/canonical, though the page serves 200. The post was absent from the live sitemap. Fix: trailing-slash the permalink; correct the index's "staged for the v1.0.0 tag" marker (1.0.0 is on npm, 2026-11-13). Two biting tests in `tests/docs-post-permalinks.test.cjs`. Ported from eyestruct.
+
+---
+
+### 2026-11-14 - session: the npm link parity pass
+
+Every family project publishes to npm; the project's own surfaces did not always say so. This session closes that gap and holds it with a test.
+
+- **Identity.** `site.config.js` gains `npm` (the published URL), and the landing nav gains an `npm` entry beside GitHub.
+- **Derivation.** `lib/sync.mjs` emits `npm_url` into the generated `docs/_config.yml`; the docs footer renders `{{ site.npm_url }}`. The brand census gate stays happy - the URL is authored once, not hardcoded in the layout.
+- **Proof.** `tests/npm-parity.test.cjs` proves the url matches `package.json`, that sync fans it into the docs config, that the footer renders it, and that the landing nav carries it. Proven to bite (removing the footer line reds the test).
+- **Template.** `npm run sync` + `npm run template` regenerated; `check` green, battery 135/135.
+- **No version bump** (the repo's own surfaces, not the shipped package's behavior).

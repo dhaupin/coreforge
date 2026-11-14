@@ -30,6 +30,7 @@ export default {
     'The shell the struct family ships sites from: a landing rig, a docs rig, and the CI/release plumbing, all driven from one brand file.',
   url: '__SITE_URL__',
   repo: '__REPO_URL__',
+  npm: 'https://www.npmjs.com/package__DOCS_BASEURL__',
   author: '__AUTHOR__',
   license: 'MIT',
   keywords:
@@ -67,6 +68,7 @@ export default {
   // renders the text link).
   nav: [
     { label: 'Home', to: '/', end: true, group: 'site' },
+    { label: 'npm', href: 'https://www.npmjs.com/package__DOCS_BASEURL__', group: 'out' },
     { label: 'GitHub', href: '__REPO_URL__', group: 'out' },
   ],
   // Footer-only extras (legal + provenance). Keep legal labels smaller than

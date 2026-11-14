@@ -30,6 +30,7 @@ export default {
     'The shell the struct family ships sites from: a landing rig, a docs rig, and the CI/release plumbing, all driven from one brand file.',
   url: 'https://coreforge.creadev.org',
   repo: 'https://github.com/dhaupin/coreforge',
+  npm: 'https://www.npmjs.com/package/coreforge',
   author: 'dhaupin',
   license: 'MIT',
   keywords:
@@ -67,6 +68,7 @@ export default {
   // renders the text link).
   nav: [
     { label: 'Home', to: '/', end: true, group: 'site' },
+    { label: 'npm', href: 'https://www.npmjs.com/package/coreforge', group: 'out' },
     { label: 'GitHub', href: 'https://github.com/dhaupin/coreforge', group: 'out' },
   ],
   // Footer-only extras (legal + provenance). Keep legal labels smaller than
