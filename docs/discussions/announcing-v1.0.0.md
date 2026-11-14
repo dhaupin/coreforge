@@ -1,5 +1,5 @@
 ---
-permalink: discussions/announcing-v1.0.0
+permalink: discussions/announcing-v1.0.0/
 layout: default
 title: Announcing coreforge v1.0.0
 description: coreforge v1.0.0 is the first stable cut of the shell the struct family ships sites from - one site identity in site.config.js, a sync verb that fans it out, and a brand census that proves no literal hid.
