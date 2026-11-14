@@ -6,6 +6,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), [SemVer](https
 
 ## [Unreleased]
 
+### 2026-11-13 - the release post was invisible to the SEO pipeline (permalink shape)
+
+`docs/discussions/announcing-v1.0.0.md` carried a dotted, slashless permalink (`permalink: discussions/announcing-v1.0.0`). Jekyll reads the `.0` as a file extension and emits the page EXTENSIONLESS on disk; freestruct's page scanner matches only `.html`/`.htm`, so the post was invisible to the post-build layer - no sitemap `<loc>`, no og/canonical - though it served 200. The post was not in the live sitemap. The trailing-slash form (`permalink: discussions/announcing-v1.0.0/`) emits `<slug>/index.html` and is seen. The index's "staged for the v1.0.0 tag" marker is corrected (1.0.0 is on npm, 2026-11-13). Two biting tests in `tests/docs-post-permalinks.test.cjs`. Ported from eyestruct (the same bug, fixed there first).
+
+
 ### 2026-11-13 - the /web family matrix (React 19 + Vite 8, prestruct ^1.5.0)
 
 The landing site moves onto the matrix prestruct 1.5.0 published: `react`/`react-dom` `^18.3.1 -> ^19.3.1`, `vite` `^5.4.0 -> ^8.3.7`, `@vitejs/plugin-react` `^4.3.1 -> ^6.3.0`, `prestruct` `^1.3.0 -> ^1.5.0`. The site bakes 3/3 pages with a clean audit on the new matrix.
