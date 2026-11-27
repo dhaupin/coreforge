@@ -142,23 +142,39 @@ test('the template ships NEUTRAL placeholder art, never the shell\'s own brand',
   }
 })
 
-test('the template art separation guard bites (a clobbered placeholder fails)', () => {
+test('the template placeholder separation guard bites (a clobbered placeholder fails)', () => {
   // House law: a new law ships with a fixture that breaks it. Simulate the
   // leak by overwriting a placeholder with the dogfood's bytes, then prove
-  // `template:check` refuses it; restore the placeholder afterward.
-  const rel = 'web/public/icon-512.png'
-  const tpl = path.join(OUT, rel)
-  const dog = path.join(ROOT, rel)
-  if (!fs.existsSync(dog)) return // no dogfood art to clobber with
-  const keep = fs.readFileSync(tpl)
-  try {
-    fs.writeFileSync(tpl, fs.readFileSync(dog))
-    const r = run(['--check'])
-    assert.equal(r.code, 1, 'a clobbered placeholder must fail template:check')
-    assert.match(r.out, /brand-art leak/)
-  } finally {
-    fs.writeFileSync(tpl, keep)
+  // `template:check` refuses it; restore the placeholder afterward. Cover both
+  // classes: the binary art and the landing page.
+  for (const rel of ['web/public/icon-512.png', 'web/src/pages/Home.jsx']) {
+    const tpl = path.join(OUT, rel)
+    const dog = path.join(ROOT, rel)
+    if (!fs.existsSync(dog)) continue // no dogfood file to clobber with
+    const keep = fs.readFileSync(tpl)
+    try {
+      fs.writeFileSync(tpl, fs.readFileSync(dog))
+      const r = run(['--check'])
+      assert.equal(r.code, 1, `a clobbered placeholder (${rel}) must fail template:check`)
+      assert.match(r.out, /placeholder leak/)
+    } finally {
+      fs.writeFileSync(tpl, keep)
+    }
   }
+})
+
+test('the template landing is a NEUTRAL placeholder, never the dogfood\'s marketing', () => {
+  // The dogfood landing is coreforge's own pitch (who it is for, why it is
+  // needed, the CLI verbs). Shipping it would hand every adopter a site that
+  // sells coreforge, so the template keeps a neutral placeholder instead. This
+  // fixture fails if a rebuild leaks the dogfood's landing copy.
+  const tpl = fs.readFileSync(path.join(OUT, 'web', 'src', 'pages', 'Home.jsx'), 'utf8')
+  for (const phrase of ['Who it is for', 'Why it is needed', 'It is not a one-site idea']) {
+    assert.ok(!tpl.includes(phrase), `the template landing must not carry the dogfood's "${phrase}" section`)
+  }
+  // And the dogfood's own landing must NOT be byte-identical (it is a different file).
+  const dog = fs.readFileSync(path.join(ROOT, 'web', 'src', 'pages', 'Home.jsx'), 'utf8')
+  assert.notEqual(tpl, dog, 'the template landing must differ from the dogfood\'s')
 })
 
 test('the template carries no identity literal of the dogfood brand (only tokens)', async () => {

@@ -136,6 +136,29 @@ test('create refuses a scheme-less docsHost (the docs-link trap)', () => {
   }
 });
 
+test('create decouples the npm package URL from the docs baseurl', () => {
+  // The npm URL embeds the package name; the docs baseurl is a different fact.
+  // Before the __NPM_URL__ token the name/baseurl tokens clipped the URL into
+  // `package__DOCS_BASEURL__`, so an adopter whose baseurl differed from their
+  // package name stamped a dead npm link. The two must move independently.
+  const dir = tmp();
+  try {
+    writeFileSync(join(dir, 'site.json'), JSON.stringify({
+      name: 'acme', url: 'https://acme.creadev.org', repo: 'https://github.com/acme/acme',
+      docsBaseurl: '/widgets', npm: 'https://www.npmjs.com/package/@scope/acme',
+    }));
+    const res = cli(['create', dir]);
+    assert.equal(res.status, 0, res.stderr);
+    const cfg = require('node:fs').readFileSync(join(dir, 'site.config.js'), 'utf8');
+    assert.doesNotMatch(cfg, /__[A-Z][A-Z_]*__/, 'no token may survive the stamp');
+    assert.match(cfg, /npm: 'https:\/\/www\.npmjs\.com\/package\/@scope\/acme'/,
+      'the npm url must be the package name, not the docs baseurl');
+    assert.doesNotMatch(cfg, /package\/widgets/, 'the npm url must not borrow the docs baseurl');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('sync refuses a scheme-less docs.host in the committed config', () => {
   const dir = tmp();
   try {
